@@ -73,9 +73,9 @@
 		},
 		created() {
 			console.log(this.userinfo)
-			this.username = this.userinfo.username
+			this.username = this.userinfo.Username
 			
-				this.userAvatar = this.userinfo.avatar
+				this.userAvatar = this.userinfo.Avatar
 			
 
 			// this.$forceUpdate()

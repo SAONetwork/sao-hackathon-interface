@@ -1,55 +1,57 @@
 <template>
 	<div class="filemarket">
-			<div class="filters">
-				<div class="filterstitle">
-					<img src="@/assets/images/Market/refine.png" alt="">
-					<span class='filterby'>Filter by</span>
-				</div>
-				<div v-for="(item,index) in selcectTab" :key="index">
-					<el-radio-group class="radioGroup" v-model="selcectedValue[index].selcectTabValue"
-						@change="changeSelect(index)" fill="#63a78f" text-color='#63a78f'>
-						<div class="selectedstatus">
-							<el-radio class="firstGroup" :label="item.first.name">{{item.first.name}}
-							</el-radio>
-							<!-- <div v-if="selcectedValue[index].selcectTabValue==item.first.name" class="selectedstatus1">
+		<div class="filters">
+			<div class="filterstitle">
+				<img src="@/assets/images/Market/refine.png" alt="">
+				<span class='filterby'>Filter by</span>
+			</div>
+			<div v-for="(item,index) in selcectTab" :key="index">
+				<el-radio-group class="radioGroup" v-model="selcectedValue[index].selcectTabValue"
+					@change="changeSelect(index)" fill="#63a78f" text-color='#63a78f'>
+					<div class="selectedstatus">
+						<el-radio class="firstGroup" :label="item.first.name">{{item.first.name}}
+						</el-radio>
+						<!-- <div v-if="selcectedValue[index].selcectTabValue==item.first.name" class="selectedstatus1">
 								<img src="@/assets/images/Market/Vector.png" alt="">
 
 							</div> -->
-						</div>
-						<div class="secStatus" v-for="(v,i) in item.secend" :key="i">
-							<el-radio class="secGroup" :label="v.name">{{v.name}}</el-radio>
-							<!-- <div v-if="selcectedValue[index].selcectTabValue==v.name" class="selectedstatus1">
+					</div>
+					<div class="secStatus" v-for="(v,i) in item.secend" :key="i">
+						<el-radio class="secGroup" :label="v.name">{{v.name}}</el-radio>
+						<!-- <div v-if="selcectedValue[index].selcectTabValue==v.name" class="selectedstatus1">
 								<img src="@/assets/images/Market/Vector.png" alt="">
 
 							</div> -->
 
-						</div>
+					</div>
 
-					</el-radio-group>
-					<div class="gap" v-if="index != selcectTab.length-1"></div>
-				</div>
-
+				</el-radio-group>
+				<div class="gap" v-if="index != selcectTab.length-1"></div>
 			</div>
 
-		<div class="markets">
+		</div>
+
+		<div class="markets" ref="markets">
 
 			<div class="finem">
 				<span>Space</span>
-				<img v-show="!showlist" @click="changefiletype(1)" class="changtypeicon" src="@/assets/images/Market/changtype.png" alt="">
-				<img v-show="showlist" @click="changefiletype(2)" class="changtypeicon" src="@/assets/images/Market/changetype1.png" alt="">
+				<img v-show="!showlist" @click="changefiletype(1)" class="changtypeicon"
+					src="@/assets/images/Market/changtype.png" alt="">
+				<img v-show="showlist" @click="changefiletype(2)" class="changtypeicon"
+					src="@/assets/images/Market/changetype1.png" alt="">
 			</div>
-			
-				<el-scrollbar  v-show="showlist">
-					<DocList :cancelloading='cancelloading' :FileList='FileMarketList' @loginwallet='getlogin' @buyItem='buyprofile'
-						@loadMore='loadMores'>
-					</DocList>
-				</el-scrollbar>
-			
-			
-			<el-scrollbar   v-show="!showlist">
-			<FileList :FileList='FileMarketList' @loginwallet='getlogin' @buyItem='buyprofile'
-				@loadMore='loadMores'>
-			</FileList>
+
+			<el-scrollbar v-show="showlist">
+				<DocList :cancelloading='cancelloading' :FileList='FileMarketList' @loginwallet='getlogin'
+					@buyItem='buyprofile' @loadMore='loadMores'>
+				</DocList>
+			</el-scrollbar>
+
+
+			<el-scrollbar v-show="!showlist">
+				<FileList :FileList='FileMarketList' @loginwallet='getlogin' @buyItem='buyprofile'
+					@loadMore='loadMores'>
+				</FileList>
 			</el-scrollbar>
 			<div class="loadingdialog" v-show="showMarket">
 				<div class="loading-box">
@@ -102,9 +104,9 @@
 		},
 		data() {
 			return {
-				cancelloading:false,
+				cancelloading: false,
 				showMarket: false,
-				showlist:false,
+				showlist: false,
 				DiaLogtitle: "Connect wallet",
 				BuyDiaLogtitle: "Checkout",
 				dialogVisible: false,
@@ -116,6 +118,7 @@
 				buyinginfo: {},
 				successBuyinginfo: {},
 				fallBuyinginfo: {},
+
 				FileMarketList: [
 
 				],
@@ -156,13 +159,7 @@
 								name: "MP3"
 							},
 							{
-								name: "CSV"
-							},
-							{
 								name: "JPG"
-							},
-							{
-								name: "SVG"
 							}
 						],
 						selcectTabValue: ""
@@ -178,51 +175,111 @@
 						selcectTabValue: "All Formats"
 					}
 				],
-				pagecount: 0,
-				pagelimit: 30,
-				fileTotal: 0
+			
+				fileTotal: 0,
+
+				fileParams: {
+					offset: 0,
+					limit: 0,
+					pricing: '',
+					type: '',
+					format: ''
+				}
 			};
 		},
 		created() {
+			this.$nextTick(()=>{
+				var eWidth = this.$refs.markets.clientWidth
+				this.fileParams.limit=Math.floor(eWidth/250)*3
+			})
+			this.showMarket = true
 			this.getFileList()
 		},
 		methods: {
 
 			loadMores() {
+				
 				if (this.fileTotal > this.FileMarketList.length) {
-					this.pagecount = this.pagecount + this.pagelimit
+					this.fileParams.offset = this.fileParams.offset + this.fileParams.limit
 					this.getFileList()
-					this.cancelloading=false
-				}else{
-					this.cancelloading=true
+					this.cancelloading = false
+				} else {
+					this.cancelloading = true
 				}
 
 			},
 			getFileList() {
-				if(this.showlist==false){
-					this.showMarket = true
-					
-				}else{
-					this.showMarket = false
-				}
-				fileInfos({
-					offset: this.pagecount,
-					limit: this.pagelimit
-				}).then(res => {
+				// if (this.showlist == false) {
+				// 	this.showMarket = true
+
+				// } else {
+				// 	this.showMarket = false
+				// }
+				fileInfos(this.fileParams).then(res => {
 					console.log(res);
 					this.fileTotal = res.data.Total
 					this.showMarket = false
 					// this.cancelloading=true
 					if (res.data.FileInfoInMarkets != null) {
-						res.data.FileInfoInMarkets.forEach(item=>{
-							item.iscol=false
+						res.data.FileInfoInMarkets.forEach(item => {
+							item.iscol = false
 						})
 						this.FileMarketList.push(...res.data.FileInfoInMarkets)
 					}
 				}).catch()
 			},
 			changeSelect(index) {
+				this.showMarket = true
 				console.log(this.selcectedValue);
+				console.log(this.selcectedValue[index]);
+				console.log(this.selcectedValue);
+				// price
+				if (index == 0) {
+					this.fileParams.offset = 0
+					if (this.selcectedValue[index].selcectTabValue == 'Free') {
+						this.fileParams.pricing = false
+						this.FileMarketList = []
+						this.getFileList()
+					} else if (this.selcectedValue[index].selcectTabValue == "Premium") {
+						this.fileParams.pricing = true
+						this.FileMarketList = []
+						this.getFileList()
+					} else {
+						this.fileParams.pricing = ''
+						this.FileMarketList = []
+						this.getFileList()
+					}
+				}
+				if (index == 1) {
+					if(this.selcectedValue[index].selcectTabValue == 'All Types'){
+						this.fileParams.offset = 0
+						this.fileParams.type = ''
+						this.FileMarketList = []
+						this.getFileList()
+					}else{
+						this.fileParams.offset = 0
+						this.fileParams.type = this.selcectedValue[index].selcectTabValue
+						this.FileMarketList = []
+						this.getFileList()
+					}
+					
+
+				}
+				if (index == 2) {
+					if(this.selcectedValue[index].selcectTabValue == 'All Formats'){
+						this.fileParams.offset = 0
+						this.fileParams.format = ''
+						this.FileMarketList = []
+						this.getFileList()
+					}else{
+						this.fileParams.offset = 0
+						this.fileParams.format = this.selcectedValue[index].selcectTabValue
+						this.FileMarketList = []
+						this.getFileList()
+					}
+					
+
+				}
 			},
 			getlogin() {
 				this.dialogVisible = true;
@@ -246,11 +303,11 @@
 				this.fallVisible = true
 				this.fallBuyinginfo = item
 			},
-			changefiletype(val){
-				if(val==1){
-					this.showlist =true
-				}else{
-					this.showlist =false
+			changefiletype(val) {
+				if (val == 1) {
+					this.showlist = true
+				} else {
+					this.showlist = false
 				}
 			}
 		}
@@ -262,7 +319,7 @@
 		height: 100%;
 		min-width: 250px;
 
-	
+
 	}
 
 	.el-scrollbar ::v-deep .el-scrollbar__wrap {
@@ -429,9 +486,11 @@
 			padding: 15px 0;
 			padding-left: 32px;
 			overflow: hidden;
-			/deep/.filelist{
+
+			/deep/.filelist {
 				padding-bottom: 50px;
 			}
+
 			// padding-bottom: 50px;
 			// position: relative;
 			.finem {
@@ -452,7 +511,7 @@
 					height: 36px;
 					cursor: pointer;
 				}
-				
+
 			}
 
 			.loadingdialog {

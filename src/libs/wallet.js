@@ -76,7 +76,7 @@ const install = () => {
 
             //const address = window.ethereum.selectedAddress;
 			const res = await window.ethereum.request({
-				method: "eth_requestAccounts"
+				method: "eth_accounts"
 			})
             const address = res[0]
 			console.log("selectedAddress:", address);

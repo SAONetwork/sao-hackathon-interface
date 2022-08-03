@@ -7,14 +7,14 @@
 					<div class="user-info">
 						<div class="user-message">
 							<div class="user-avatar">
-								<img class="user-head" v-if='userinfo.avatar' :src="userinfo.avatar" alt="">
+								<img class="user-head" v-if='userinfo.Avatar' :src="userinfo.Avatar" alt="">
 								<img class="user-head" v-else src="@/assets/images/Profile/avatar.png" alt="">
 							</div>
 							<div class="user-details">
-								<span class="nikeName">{{userinfo.username}}</span>
+								<span class="nikeName">{{userinfo.Username}}</span>
 								<div class="walletinfo">
-									<span class="walletnumber">{{userinfo.ethAddr}}</span>
-									<div class="copy" @click="copyNumber(userinfo.ethAddr)">
+									<span class="walletnumber">{{userinfo.EthAddr}}</span>
+									<div class="copy" @click="copyNumber(userinfo.EthAddr)">
 										<img class="copyicon" src="@/assets/images/Profile/Vector.png" alt="">
 										<span v-show="!iscopy">Copy</span>
 										<span v-show="iscopy">Copied</span>
@@ -22,11 +22,11 @@
 								</div>
 								<div class="userfinenumber">
 									<div class="finenumber">
-										<span class="finenumberdetails">{{userSummary.publicUploads}}
+										<span class="finenumberdetails">{{userSummary.PublicUploads}}
 										</span><span>Files</span>
 									</div>
 									<div class="finenumber">
-										<span class="finenumberdetails">{{userSummary.collections}}
+										<span class="finenumberdetails">{{userSummary.Collections}}
 										</span><span>Collections</span>
 									</div>
 								</div>
@@ -64,7 +64,7 @@
 
 					</div>
 					<div :class="tabNumber==2?'tabActive singletab':'singletab'" @click="showtabs(2)">
-						<span>Collection</span>
+						<span>Collections</span>
 
 						<div v-if="tabNumber==2" class="activeBar"></div>
 
@@ -93,45 +93,6 @@
 
 				<div class="tabNumber1" v-if="tabNumber==1">
 					<div class="tabNumberHome">
-						<!-- <div class="homehead">
-							<div>
-								<img class="homeheadicon" src="@/assets/images/Profile/data.png" alt="">
-								<span>Data</span>
-							</div>
-
-						</div>
-						<div class="user-information">
-							<div class="user-infodetails">
-								<span class="infostitle">Storage Space </span>
-								<span class="infosmain" v-if='userSummary.SpaceUsed>=0'>
-									{{userSummary.SpaceUsed}}G/{{userSummary.spaceQuota}}G </span>
-								<span class="infosmain" v-else>-</span>
-							</div>
-							<div class="user-infodetails">
-								<span class="infostitle">Applications </span>
-								<span class="infosmain"
-									v-if='userSummary.Applications>=0'>{{userSummary.Applications}}</span>
-								<span class="infosmain" v-else>-</span>
-							</div>
-							<div class="user-infodetails">
-								<span class="infostitle">Total Uploads (Public)</span>
-								<span class="infosmain"
-									v-if='userSummary.totalUploads>=0'>{{userSummary.totalUploads}}</span>
-								<span class="infosmain" v-else>-</span>
-							</div>
-							<div class="user-infodetails">
-								<span class="infostitle">Total Purchases </span>
-								<span class="infosmain"
-									v-if='userSummary.purchasesFiles>=0'>{{userSummary.purchasesFiles}}</span>
-								<span class="infosmain" v-else>-</span>
-							</div>
-							<div class="user-infodetails">
-								<span class="infostitle">Collections </span>
-								<span class="infosmain"
-									v-if='userSummary.collections>=0'>{{userSummary.collections}}</span>
-								<span class="infosmain" v-else>-</span>
-							</div>
-						</div> -->
 						<div class="homehead">
 							<div>
 								<img class="homeheadicon" src="@/assets/images/Profile/data.png" alt="">
@@ -150,8 +111,8 @@
 							</div>
 							<div class="user-infodetails">
 								<span class="infostitle">Total Purchased </span>
-								<span class="infosmain" v-if='userSummary.purchasesFiles>=0'>
-									{{userSummary.purchasesFiles}}
+								<span class="infosmain" v-if='userSummary.PurchasesFiles>=0'>
+									{{userSummary.PurchasesFiles}}
 								</span>
 								
 								<span class="infosmain" v-else>-</span>
@@ -176,8 +137,8 @@
 							</div>
 							<div class="user-infodetails">
 								<span class="infostitle">Available Claim </span>
-								<span class="infosmain" v-if='userSummary.AvailableClaim>=0'>
-									{{userSummary.AvailableClaim}} ETH
+								<span class="infosmain" v-if='userinfo.balance >=0'>
+									{{userinfo.balance }} ETH
 								</span>
 								
 								<span class="infosmain" v-else>-</span>
@@ -244,7 +205,7 @@
 						<div class='nofiles'>
 							<img class="nofilesicon" src="@/assets/images/Profile/nofiles.png" alt="">
 							<span class="nofilestxt">
-								No files
+								No collections
 							</span>
 						</div>
 					</div>
@@ -339,7 +300,7 @@
 					height: "28px"
                 },
 				userinfo: {
-					avatar: "",
+					Avatar: "",
 					nikeName: "***REMOVED***",
 					walletNum: "***REMOVED***",
 					fileNumber: "310",
@@ -401,7 +362,7 @@
                 this.$checkConnectedAndNetwork().then(({ network, connected }) => {
                     this.ChangeRinkebyVisible = !network && network !== undefined;
                     if (network) {
-                        this.claim(this.userinfo.ethAddr);
+                        this.claim(this.userinfo.EthAddr);
                     } else {
                         this.$message.error('please connect wallet');
                     }
@@ -432,24 +393,13 @@
 				console.log(this.userinfo)
 				this.eiditVisible = true
 			},
-			updateUser() {
-				this.loading = true;
-				update({
-					avatar: "",
-					username: ""
-				}).then(res => {
-					console.log(res);
-					this.loading = false;
-				}).catch(() => this.loading = false)
-			},
+		
 
 			getUserInfo(address) {
 				getUserProfile()
 					.then(res => {
 						console.log(res);
-						// if (res.data == null || res.data.ethAddr == null) {
-						// 	this.updateUser()
-						// }
+						
                         this.$contractBalances(this.$address).then(result => {
 						    this.userinfo = res.data
                             this.userinfo.balance = Web3.utils.fromWei(result+"", 'ether')

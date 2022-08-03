@@ -25,8 +25,11 @@
 					<div class="hollowwalletBtn" @click="checkMine">
 						<img class="hollowwalletBtnback" src="../assets/images/Common/walletinfo.png" alt="" />
 						<div class="mywalletinfo">
-							<img class="walletPic" src="../assets/images/Common/wallet.png" alt="" />
-							<span class="walletname" v-if="userinfo.username">{{userinfo.username}}</span>
+							<div class="userinfoavatar">
+								<img class="walletPic" v-if='userinfo.Avatar' :src="userinfo.Avatar" alt="">
+								<img class="walletPic" v-else src="@/assets/images/Profile/avatar.png" alt="">
+							</div>
+							<span class="walletname" v-if="userinfo.Username">{{userinfo.Username}}</span>
 							<span class="walletname" v-else>{{testfile(address)}}</span>
 						</div>
 					</div>
@@ -368,11 +371,19 @@
 						font-size: 14px;
 						align-items: center;
 						color: #ffffff;
-
+						.userinfoavatar{
+							width: 24px;
+							height: 24px;
+							border: 1px solid #58FFC3;
+							border-radius: 50%;
+							overflow: hidden;
+							// box-sizing: border-box;
+							margin-right: 8px;
+						}
 						.walletPic {
-							width: 20px;
-							height: 16px;
-							padding-right: 8px;
+							width: 24px;
+							height: 24px;
+							// object-fit: cover;
 						}
 
 						.walletname {
