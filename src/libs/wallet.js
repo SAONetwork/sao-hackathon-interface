@@ -62,6 +62,11 @@ const install = () => {
 		}
 		return false;
 	}
+	
+	/* disconnect */
+	Vue.prototype.$disconnect = async () => {
+		localStorage.setItem("disconnect", true);
+	}
 
 	/* check connected and network */
 	Vue.prototype.$checkConnectedAndNetwork = async () => {
@@ -78,8 +83,13 @@ const install = () => {
 			const res = await window.ethereum.request({
 				method: "eth_accounts"
 			})
-            const address = res[0]
+            let address = res[0]
 			console.log("selectedAddress:", address);
+			
+			if (localStorage.getItem("disconnect")) {
+				address = null;
+			}
+			
 			return {
 				network: config.networkChainIdList.includes(chainId),
 				connected: address != null
@@ -102,6 +112,7 @@ const install = () => {
 	/* Get wallet address */
 	Vue.prototype.$getWalletAddress = async () => {
         Vue.prototype.$address = ""
+		localStorage.removeItem("disconnect");
 		if (window.ethereum) {
 			const res = await window.ethereum.request({
 				method: "eth_requestAccounts"

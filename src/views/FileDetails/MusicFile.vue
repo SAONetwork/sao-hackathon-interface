@@ -444,9 +444,7 @@
 
 				.musictitle {
 					width: 100%;
-					display: flex;
-					align-items: center;
-					justify-content: flex-start;
+					
 					font-weight: 700;
 					font-size: 16px;
 					line-height: 21px;
@@ -456,14 +454,15 @@
 					.musicicon {
 						width: 12px;
 						height: 12px;
-						line-height: 21px;
-						// padding-top: 5px;
+						float: left;
+						padding-top: 6px;
 						margin-right: 9px;
 					}
 				}
 
-				.filemessage {
+				.musicname {
 					width: 100%;
+					word-break: break-all;
 				}
 
 				.filemessage {

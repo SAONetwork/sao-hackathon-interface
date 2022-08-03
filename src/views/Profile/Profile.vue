@@ -301,8 +301,8 @@
                 },
 				userinfo: {
 					Avatar: "",
-					nikeName: "***REMOVED***",
-					walletNum: "***REMOVED***",
+					nikeName: "",
+					walletNum: "",
 					fileNumber: "310",
                     balance: 0
 				},
@@ -315,40 +315,49 @@
 				allDownloadedList: []
 			};
 		},
-		created() {
-			this.$getWalletAddress().then(address => {
-				if (address) {
-					let currentSign = utils.getCurrentSign(address);
-					if (!currentSign) {
-						let signaturemessage = config.signMessage + address;
-						this.$sign(signaturemessage, address)
-							.then(signature => {
-								let sign = {
-									address,
-									signaturemessage,
-									signature
-								};
-								localStorage.setItem(config.localStorageSignKey, JSON.stringify(sign));
-								utils.setSignList(sign);
-								this.getUserInfo(address)
-								this.getUserDashboard()
-								this.getSummary()
-								this.getUserPurchases()
-							})
-							.catch(() => {
-								location.reload();
-							});
-					} else {
-						localStorage.setItem(config.localStorageSignKey, JSON.stringify(currentSign));
-						this.getUserInfo(address)
-						this.getUserDashboard()
-						this.getSummary()
-						this.getUserPurchases()
+	mounted() {
+		this.$checkConnectedAndNetwork().then(({
+			network,
+			connected
+		}) => {
+			if (connected) {
+				this.$getWalletAddress().then(address => {
+					if (address) {
+						let currentSign = utils.getCurrentSign(address);
+						if (!currentSign) {
+							let signaturemessage = config.signMessage + address;
+							this.$sign(signaturemessage, address)
+								.then(signature => {
+									let sign = {
+										address,
+										signaturemessage,
+										signature
+									};
+									localStorage.setItem(config.localStorageSignKey, JSON.stringify(sign));
+									utils.setSignList(sign);
+									this.getUserInfo(address)
+									this.getUserDashboard()
+									this.getSummary()
+									this.getUserPurchases()
+								})
+								.catch(() => {
+									location.reload();
+								});
+						} else {
+							localStorage.setItem(config.localStorageSignKey, JSON.stringify(currentSign));
+							this.getUserInfo(address)
+							this.getUserDashboard()
+							this.getSummary()
+							this.getUserPurchases()
+						}
 					}
-				}
-			});
-			console.log(this.FileMarketList)
-		},
+				});
+			}
+			else {
+				this.$router.push('/Space');
+			}
+		})
+	},
 		components: {
 			MiniHollowBtn,
 			ActiveBtn,
@@ -379,7 +388,12 @@
                     }
                 });
             },
-			Disconnect() {},
+			Disconnect() {
+				this.$disconnect();
+				this.$router.push('/Space');
+				location.reload()
+				// location.href = "https://harmonious-treacle-9cadd3.netlify.app";
+			},
 			getSummary() {
 				getUserSummary()
 					.then(res => {

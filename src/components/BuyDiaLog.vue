@@ -222,13 +222,14 @@ export default {
 		.profileinfo-details {
 			flex: 1;
 			overflow: hidden;
-			height: 120px;
+			height: 124px;
 			margin-left: 15px;
 			display: flex;
 			flex-direction: column;
 			justify-content: space-between;
-
+			
 			.profilename {
+				line-height: 21px;
 				font-size: 16px;
 				color: #58ffc3;
 				overflow: hidden;
@@ -239,8 +240,8 @@ export default {
 
 			.profiledesc {
 				width: 100%;
-				height: 25%;
-				padding: 10px 0;
+				// height: 25%;
+				
 				color: #57b196;
 				font-size: 14px;
 				line-height: 1.3em;

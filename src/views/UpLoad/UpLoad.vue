@@ -271,6 +271,20 @@
 			InactiveButton,
 			ChangeRinkeby
 		},
+		mounted() {
+			this.$checkConnectedAndNetwork().then(({
+				network,
+				connected
+			}) => {
+				if (connected) {
+					
+				}
+				else {
+					this.$router.push('/Space');
+					location.reload()
+				}
+			})
+		},
 		watch: {
 			uploadForm: {
 				handler(newValue, oldValue) {

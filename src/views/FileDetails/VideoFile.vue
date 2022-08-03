@@ -398,22 +398,28 @@
 			padding-top: 20px;
 
 			.filetitle {
-				display: flex;
-				align-items: center;
-				justify-content: flex-start;
+				// display: flex;
+				// align-items: center;
+				// justify-content: flex-start;
+				position: relative;
 				font-weight: 700;
 				font-size: 24px;
-				line-height: 32px;
+				// line-height: 32px;
 				color: #58FFC3;
-
+				width: 100%;
 				.videoicon {
+					float: left;
 					width: 28px;
 					height: 20px;
-					padding-right: 14px;
+					padding-top: 6px;
+					margin-right: 14px;
 				}
 
 				.filename {
-					word-break: break-all
+					// text-indent:1.8em;
+					width: 100%;
+					word-break: break-all;
+					line-height: 32px;
 				}
 			}
 
