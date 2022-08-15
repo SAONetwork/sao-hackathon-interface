@@ -6,7 +6,7 @@ export default {
 
 	//Base API
 	timeout: 100000,
-	baseApi: "https://rinkeby.sao.network/saods/api/v1/",
+	baseApi: "https://rinkeby.sao.network/staging-saods/api/v1/",
 	
 	//Contract address
 	contractAddress: "0xFA5D30eAC8c9831eCe8b082F2A353Ba86Ee59cb8",
