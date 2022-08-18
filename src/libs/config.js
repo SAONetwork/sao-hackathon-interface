@@ -9,7 +9,7 @@ export default {
 	baseApi: "https://rinkeby.sao.network/staging-saods/api/v1/",
 	
 	//Contract address
-	contractAddress: "0xd370874E00029cdEda79575C2F55Ba200052A8C6",
+	contractAddress: "0xEd1aAE0961A541F95245B3eade8Dfe456509c87F",
 	
 	//network chainId
 	networkChainIdList: ["0x4"],
