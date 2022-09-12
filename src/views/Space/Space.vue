@@ -147,22 +147,6 @@
 							name: "Other"
 						}],
 						selcectTabValue: ""
-					},
-					{
-						first: {
-							name: "All Formats"
-						},
-						secend: [{
-								name: "MP4"
-							},
-							{
-								name: "MP3"
-							},
-							{
-								name: "JPG"
-							}
-						],
-						selcectTabValue: ""
 					}
 				],
 				selcectedValue: [{
