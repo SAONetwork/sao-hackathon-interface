@@ -102,7 +102,11 @@
 			});
 
 			this.$changeNetwork(res => {
-				location.reload();
+                let currentChainId = localStorage.getItem("chainId")
+                if (!currentChainId || parseInt(currentChainId) != _chainId) {
+                    localStorage.setItem("chainId", _chainId + '')
+                    window.location.reload()
+                }
 			});
 
 
