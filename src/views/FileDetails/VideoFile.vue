@@ -115,7 +115,7 @@
 							<span>10</span>
 						</div>
 						<div class="boardicon"><img class="commenticon" src="@/assets/images/Common/comment.png" alt="">
-							<span>10</span>
+							<span>1</span>
 						</div>
 						<div class="shareicon"><img class="leftshareicon" src="@/assets/images/Common/share.png" alt="">
 				
@@ -124,11 +124,11 @@
 				</div>
 				<div class="changetab">
 					<div :class="tabNumber==1?'tabActive singletab':'singletab'" @click="showtabs(1)">
-						<span>Comments(210)</span>
+						<span>Comments(1)</span>
 						<div v-if="tabNumber==1" class="activeBar"></div>
 					</div>
 					<div :class="tabNumber==2?'tabActive singletab':'singletab'" @click="showtabs(2)">
-						<span>Collection list(12)</span>
+						<span>Collection list(2)</span>
 						<div v-if="tabNumber==2" class="activeBar"></div>
 					</div>
 				</div>
