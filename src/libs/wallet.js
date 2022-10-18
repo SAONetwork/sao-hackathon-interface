@@ -29,9 +29,16 @@ const install = () => {
 	Vue.prototype.$switchNetwork = async (callBack) => {
 		try {
 			await (window.ethereum).request({
-				method: 'wallet_switchEthereumChain',
+				method: 'wallet_addEthereumChain',
 				params: [{
-					chainId: Web3.utils.numberToHex(4)
+                    chainId: config.defaultChainId,
+                    chainName: config.defaultChainName,
+                    nativeCurrency: {
+                        name: config.defaultSymbol,
+                        symbol: config.defaultSymbol,
+                        decimals: 18
+                    },
+                    rpcUrls: [config.defaultProvider],
 				}]
 			})
 			callBack("success")

@@ -6,13 +6,25 @@ export default {
 
 	//Base API
 	timeout: 100000,
-	baseApi: "https://rinkeby.sao.network/staging-saods/api/v1/",
+	baseApi: "https://bsctest.sao.network/saods/api/v1/",
 	
 	//Contract address
-	contractAddress: "0xEd1aAE0961A541F95245B3eade8Dfe456509c87F",
+	contractAddress: "0xBe3359e7d267E9C7d6e044b5F509c0074B8f71C0",
 	
 	//network chainId
-	networkChainIdList: ["0x4"],
+	networkChainIdList: ["0x61"],
+
+    //default chainId
+    defaultChainId: "0x61",
+
+    //default Provider: 
+    defaultProvider: "https://data-seed-prebsc-1-s1.binance.org:8545",
+
+    //default chainName
+    defaultChainName: "Binance Smart Chain Testnet",
+
+    //default Symbol
+    defaultSymbol: "TBNB",
 	
 	//sign message
 	signMessage: `Welcome to Storverse\nClick "Sign" to continue.\n\nThis signature will cost 0 gas.\n\nWallet address:\n`

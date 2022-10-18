@@ -4,7 +4,7 @@
 		<div class="dialog" v-if="visible" @click.self="cancleDialog">
 			<div class="dialoginfo">
 				<div class="title">Please switch to a supported
-					network (Rinkeby)</div>
+					network (BSC Testnet)</div>
 					<div class="btn">
 						<BorderBtn class="padingstyle" @onClickBtn="cancleDialog" :btnText='BorderbtnText' :btnstyle='uploadbtnstyle'>
 						</BorderBtn>
