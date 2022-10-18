@@ -66,7 +66,7 @@
 
 				<div class="nobuy" v-if="item.Price>0 && item.AlreadyPaid==false">
 					<el-tooltip :content="item.Price+''" placement="top">
-						<div class="price">{{item.Price | numRounding}} ETH</div>
+						<div class="price">{{item.Price | numRounding}} BNB</div>
 					</el-tooltip>
 					<HollowBtn class="shadow" @BHoBtn='Download(item)' v-if="item.EthAddr.toLowerCase()==address" :btnSize='smallbtnSize'>
 						<div slot="btncontent" class="HollowBtn">

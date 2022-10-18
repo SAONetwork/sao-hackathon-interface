@@ -104,7 +104,7 @@
 							<div class="user-infodetails">
 								<span class="infostitle">Total Paid </span>
 								<span class="infosmain" v-if='userSummary.TotalPaid>=0'>
-									{{userSummary.TotalPaid}} ETH
+									{{userSummary.TotalPaid}} BNB 
 								</span>
 								
 								<span class="infosmain" v-else>-</span>
@@ -121,7 +121,7 @@
 							<div class="user-infodetails">
 								<span class="infostitle">Total Earned</span>
 								<span class="infosmain" v-if='userSummary.TotalEarned>=0'>
-									{{userSummary.TotalEarned}} ETH
+									{{userSummary.TotalEarned}} BNB
 								</span>
 								
 								<span class="infosmain" v-else>-</span>
@@ -138,7 +138,7 @@
 							<div class="user-infodetails">
 								<span class="infostitle">Available Claim </span>
 								<span class="infosmain" v-if='userinfo.balance >=0'>
-									{{userinfo.balance }} ETH
+									{{userinfo.balance }} BNB
 								</span>
 								
 								<span class="infosmain" v-else>-</span>

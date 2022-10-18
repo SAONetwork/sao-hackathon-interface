@@ -89,7 +89,7 @@
 							<ActiveBtn @onClickBtn="buyprofile" :btnText="paynowbtnText" :btnstyle="middleSize" v-else>
 							</ActiveBtn>
 							
-							<div class="price">{{fileParams.Price}} ETH</div>
+							<div class="price">{{fileParams.Price}} BNB</div>
 				
 						</div>
 						
@@ -97,7 +97,7 @@
 				
 							<!-- <ActiveBtn @onClickBtn="gotodownload" :btnText="SolidbtnText" :btnstyle="middleSize">
 							</ActiveBtn> -->
-							<div class="price"> paid {{fileParams.Price}} ETH</div>
+							<div class="price"> paid {{fileParams.Price}} BNB</div>
 						</div>
 						<div class="nobuy" v-if="fileParams.Price==0">
 							

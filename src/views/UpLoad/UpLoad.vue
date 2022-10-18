@@ -156,7 +156,7 @@
 
 									</el-input>
 									<div class="priceunit">
-										ETH
+										BNB
 									</div>
 								</div>
 
@@ -244,7 +244,7 @@
 				},
 				inputTags: "",
 				imageUrl: "",
-				selectprice: "ETH",
+				selectprice: "BNB",
 				recommendedTags: [],
 				showUploadBtn: false,
 				doubleUploadbtn: false,
