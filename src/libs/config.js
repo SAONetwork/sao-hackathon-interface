@@ -24,7 +24,7 @@ export default {
     defaultChainName: "Binance Smart Chain Testnet",
 
     //default Symbol
-    defaultSymbol: "TBNB",
+    defaultSymbol: "BNB",
 	
 	//sign message
 	signMessage: `Welcome to Storverse\nClick "Sign" to continue.\n\nThis signature will cost 0 gas.\n\nWallet address:\n`
