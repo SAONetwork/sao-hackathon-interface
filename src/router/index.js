@@ -28,6 +28,12 @@ const routes = [{
 			name: 'Profile',
 			component: () => import('../views/Profile/Profile.vue'),
 
+		},
+		{
+			path: '/OtherProfile',
+			name: 'OtherProfile',
+			component: () => import('../views/Profile/OtherProfile.vue'),
+		
 		}]
 	},
 	{
@@ -64,6 +70,28 @@ const routes = [{
 
 			}
 		]
+	},
+	{
+		path: '',
+		name: 'collection',
+		component: Main,
+		children: [{
+			path: '/Collectioninfo',
+			name: 'Collectioninfo',
+			component: () => import('../views/Collection/CollectionInfo.vue'),
+	
+		}]
+	},
+	{
+		path: '',
+		name: 'search',
+		component: Main,
+		children: [{
+			path: '/Search',
+			name: 'Search',
+			component: () => import('../views/Search/Search.vue'),
+	
+		}]
 	},
 ]
 const originalPush = VueRouter.prototype.push

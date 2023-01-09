@@ -147,6 +147,22 @@
 							name: "Other"
 						}],
 						selcectTabValue: ""
+					},
+					{
+						first: {
+							name: "All Formats"
+						},
+						secend: [{
+								name: "MP4"
+							},
+							{
+								name: "MP3"
+							},
+							{
+								name: "JPG"
+							}
+						],
+						selcectTabValue: ""
 					}
 				],
 				selcectedValue: [{
@@ -208,7 +224,9 @@
 						res.data.FileInfoInMarkets.forEach(item => {
 							item.iscol = false
 						})
-						this.FileMarketList.push(...res.data.FileInfoInMarkets)
+						let arr=res.data.FileInfoInMarkets
+						this.FileMarketList=this.FileMarketList.concat(arr)
+						// this.FileMarketList.push(...res.data.FileInfoInMarkets)
 					}
 				}).catch()
 			},

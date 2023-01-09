@@ -8,6 +8,11 @@ import 'element-ui/lib/theme-chalk/index.css';
 // import "./assets/font/font.css";
 import Loading from './components/Loading/Loading'
 Vue.use(Loading)
+import DeleteDialog from './components/DeleteDialog.vue'
+Vue.component('DeleteDialog',DeleteDialog)
+
+import IntoCollection from './components/IntoCollection.vue'
+Vue.component('IntoCollection',IntoCollection)
 
 Vue.use(ElementUI);
 Vue.config.productionTip = false

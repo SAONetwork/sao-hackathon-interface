@@ -47,3 +47,44 @@ export let getUserPurchases = (query) => {
         params: query
     })
 };
+
+/**
+ * get other user info
+ */
+export let  getOtherUserinfo = (query) => {
+    return http.get('user', {
+        params: query
+    })
+};
+/**
+ * follow a user
+ */
+
+export let followUser = (query) => {
+    return http.post(`/user/follow/${query}`)
+	
+};
+/**
+ * cancel following of a user
+ */
+
+export let cancelFollowing = (query) => {
+    return http.delete(`/user/follow/${query}`)
+	
+};
+/**
+ * get user followers
+ */
+export let  getUserFollower = (query) => {
+    return http.get('user/followers', {
+        params: query
+    })
+};
+/**
+ * get user followings
+ */
+export let  getUserFollowing = (query) => {
+    return http.get('user/followings', {
+        params: query
+    })
+};

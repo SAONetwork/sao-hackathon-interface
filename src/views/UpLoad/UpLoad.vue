@@ -124,7 +124,7 @@
 										</div>
 									</div>
 
-									<el-input @focus=focusOn @blur="cancelon" @change='addTig' @input="putfileTags"
+									<el-input @focus='focusOn' @blur="cancelon" @change='addTig' @input="putfileTags"
 										maxlength="20"
 										placeholder="4-20 tags is allowed. Separate your tags with a COMMA."
 										v-model="inputTags"></el-input>
@@ -156,7 +156,7 @@
 
 									</el-input>
 									<div class="priceunit">
-										BNB
+										ETH
 									</div>
 								</div>
 
@@ -244,7 +244,7 @@
 				},
 				inputTags: "",
 				imageUrl: "",
-				selectprice: "BNB",
+				selectprice: "ETH",
 				recommendedTags: [],
 				showUploadBtn: false,
 				doubleUploadbtn: false,
@@ -280,8 +280,7 @@
 					
 				}
 				else {
-					this.$router.push('/Space');
-					location.reload()
+					location.href = "https://harmonious-treacle-9cadd3.netlify.app";
 				}
 			})
 		},

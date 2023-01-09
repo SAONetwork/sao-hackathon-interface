@@ -1,6 +1,7 @@
 <template>
-	<el-scrollbar  ref="scrollbar">
+	<el-scrollbar>
 		<div class="otherfile">
+			<DeleteDialog :visible.sync='showDelete' :title="deleteTitle"></DeleteDialog>
 			<!-- top -->
 			<div class="filedetails">
 				<!-- top1 -->
@@ -12,64 +13,46 @@
 					<!-- right -->
 					<div class="filetext">
 						<div class="filename">
-							{{fileParams.Title}}
+							<img style="width: 30px;height: 24px;margin-right: 10px;" src="@/assets/images/Common/Subtract.png" alt="">
+							<!-- <img style="width: 24px;height: 29px;margin-right: 10px;" src="@/assets/images/Market/col.png" alt=""> -->
+							
+							<span>{{fileParams.Title}}</span>
+							
 						</div>
 						<div class="filemessage">
 							<span class="fileEthAddr infostyle">{{testfile(fileParams.EthAddr)}}</span>
 							<div class="gap"></div>
 							<span class="infostyle"> Uploaded at&nbsp;{{fileParams.CreatedAt}}</span>
 							<div class="gap"></div>
-							<span class="infostyle">{{fileParams.FileCategory}}</span>
-							<div class="gap"></div>
-							<span class="infostyle">{{fileParams.fileType}}</span>
+							<span class="infostyle">{{fileParams.TotalFiles}} Files</span>
+							<!-- <div class="gap"></div> -->
+							<!-- <span class="infostyle">{{fileParams.fileType}}</span> -->
 							
-							<div class="gap"></div>
-							<span class="infostyle">{{fileParams.fileSize}}</span>
+							<!-- <div class="gap"></div> -->
+							<!-- <span class="infostyle">{{fileParams.fileSize}}</span> -->
 						</div>
 						<span class="filedesc">
 							{{fileParams.Description}}</span>
-						<div class="ipfsandcointitle">
+						<!-- <div class="ipfsandcointitle">
 							<span> Ipfs Pinned:&nbsp;</span> <span class="ipfsandcoin"> {{fileParams.IpfsHash}}</span>
-						</div>
+						</div> -->
 						
 						<div class="filelabels">
 							<span class="tagstyle" v-for="(v,i) in fileParams.Labels" :key="i">{{v}}</span>
 						</div>
 						<div class="buyinginfo">
-						<div v-if="islogin==true">
+						
 							
-							<div class="nobuy" v-if="fileParams.Price>0 && fileParams.AlreadyPaid==false">
 							
-								<ActiveBtn @onClickBtn="gotodownload" :btnText="SolidbtnText" :btnstyle="middleSize"
-									v-if="fileParams.EthAddr.toLowerCase()==address"></ActiveBtn>
-								<ActiveBtn @onClickBtn="buyprofile" :btnText="paynowbtnText" :btnstyle="middleSize"
-									v-else></ActiveBtn>
-								<div class="price">{{fileParams.Price}} ETH</div>
-							
-							</div>
-							<div class="nobuy" v-if="fileParams.Price>0 && fileParams.AlreadyPaid==true">
-							
-								<ActiveBtn @onClickBtn="gotodownload" :btnText="SolidbtnText" :btnstyle="middleSize">
-								</ActiveBtn>
-								<div class="price"> paid {{fileParams.Price}} ETH</div>
-							</div>
-							<div class="nobuy" v-if="fileParams.Price==0">
-							
-								<ActiveBtn @onClickBtn="gotodownload" :btnText="SolidbtnText" :btnstyle="middleSize">
-								</ActiveBtn>
-							</div>
-						</div>
-							
-							<div class="nofilebord"  v-if="islogin==false">
-								<!-- <ActiveBtn  v-if="islogin==false" @onClickBtn="login" :btnText='btnText' :btnstyle='bigSize'></ActiveBtn>
-								 -->
-							</div>
 
 							<div class="leftboard">
-								<div class="boardicon" @click="CollectionFile">
-									<img class="leftboardicon" v-if="fileParams.Star" src="@/assets/images/Common/star1.png" alt="">
-									<img class="leftboardicon" v-else src="@/assets/images/Common/star.png" alt="">
-									<span>{{fileParams.TotalCollections}}</span>
+								<div class="boardicon" @click="addlike(true)" v-if="fileParams.Liked == false"><img class="leftboardicon" src="@/assets/images/Common/cancellike.png"
+										alt="">
+									<span>{{fileParams.TotalLikes}}</span>
+								</div>
+								<div class="boardicon" @click="addlike(false)" v-if="fileParams.Liked == true"><img class="leftboardicon" src="@/assets/images/Common/likeicon.png"
+										alt="">
+									<span>{{fileParams.TotalLikes}}</span>
 								</div>
 								<div class="boardicon"><img class="commenticon" src="@/assets/images/Common/comment.png"
 										alt="">
@@ -86,31 +69,33 @@
 				<!-- tab -->
 				<div class="changetab">
 					<div :class="tabNumber==1?'tabActive singletab':'singletab'" @click="showtabs(1)">
-						<span>Comments({{fileParams.TotalComments}})</span>
+						<span>Files({{fileParams.TotalFiles}})</span>
 						<div v-if="tabNumber==1" class="activeBar"></div>
 					</div>
 					<div :class="tabNumber==2?'tabActive singletab':'singletab'" @click="showtabs(2)">
-						<span>Collection list({{fileParams.TotalCollections}})</span>
+						<span>Comments({{fileParams.TotalComments}})</span>
 						<div v-if="tabNumber==2" class="activeBar"></div>
 					</div>
 				</div>
 			</div>
 			<!--  -->
-			<div class="Comments" v-show="tabNumber==1">
+			<div class="Comments" v-show="tabNumber==2">
 				<Comment :commentList='commentList' @replyComment='replyComment' @deleteComment='deleteFileComments' @likeComment='likeComments'></Comment>
 			</div>
-			<div class="Collection" v-show="tabNumber==2">
-				<Favorites :favolist='collections'></Favorites>
-				<div v-show="cancelloading" class="loading-box">
-					<img class="loadinggif" src="@/assets/images/Common/saoloading.gif" alt="">
+			<div class="Collection" v-show="tabNumber==1">
+				<!-- <Favorites></Favorites> -->
+				<div class="Collection-list">
+					<FileList :FileList='CollectionList'
+						@loginwallet='getlogin'>
+					</FileList>
 				</div>
+				
 			</div>
 		</div>
 		
 		<DiaLog :visible.sync="dialogVisible" :title="DiaLogtitle">
 		
 		</DiaLog>
-		<IntoCollection :visible.sync='showIntoCollection' @aleadyStar='checkAleadyStar' :checkList='intoCollectionList' :fileId='intoFileId' @loadMoreColl='loadMoreColl'></IntoCollection>
 		
 		<BuyDiaLog :visible.sync="buyDialogVisible" @successbuy='successbuy' @buyingFall='buyingFall'
 			:title="BuyDiaLogtitle" :profileInfo='buyinginfo'></BuyDiaLog>
@@ -122,8 +107,14 @@
 
 <script>
 	import {
-		fileDetails,download,getCollectionList,getComment,addFileComment,deleteFileComment,CommentLike,UnlikeComment
+		getCollectionList,deleteCollectionLike,likeCollection,getCollectionFilelist,
+		UnlikeCollComment,
+		CollCommentLike,
+		deleteCollComment,
+		addCollComment,
+		getCollComment
 	} from '../../api/FileApi.js'
+	
 	import moment from 'moment'
 	import ActiveBtn from '../../components/ActiveBtn.vue'
 	import Comment from '../../components/Comment.vue'
@@ -133,9 +124,12 @@
 	import BuyDiaLog from "@/components/BuyDiaLog.vue"
 	import SuccessDiaLog from "@/components/SuccessDiaLog.vue"
 	import FallDiaLog from "@/components/FallDiaLog.vue"
+	import FileList from "@/components/FileList.vue";
 	export default {
 		data() {
 			return {
+				showDelete:false,
+				deleteTitle:'Delete file',
 				dialogVisible: false,
 				DiaLogtitle: "Connect wallet",
 				buyDialogVisible: false,
@@ -146,37 +140,35 @@
 				fallBuyinginfo: {},
 				BuySuccesstitle: "Congratulations, purchase success!",
 				successVisible: false,
-				 
+				 CollectionList:[],
+				 fileinfoParams: {
+				 	offset: 0,
+				 	limit: 0,
+				 	collectionId:0
+				 },
 				 islogin: false,
 				 bigSize:'big',
 				 btnText:'CONNECT WALLET',
 				 
-				fileParams: {},
+				fileParams: {
+					Preview:'',
+					Title:'Collection 20220507',
+					EthAddr:'0x5344...2D3846',
+					CreatedAt:"2022/6/27 08:11 ",
+					FileCategory:"jpg1",
+					fileType:"jpg",
+					fileSize:"3.4M",
+					Description:"The Fed: more rate pain awaits Alibaba and 40 officials, The Fed: more rate pain awaits Alibaba and 40 officials The Fed: more rate pain awaits Alibaba and 40 officials,The Fed: more rate pain awaits Alibaba and 40 officials",
+					Labels:['a','b']
+				},
 				SolidbtnText: 'Download',
 				paynowbtnText: 'BUY NOW',
 				middleSize: 'middle',
 				tabNumber: 1,
 				fileId: '',
 				address:'',
-				collections:[],
-				commentList:[],
-				showIntoCollection:false,
-				intoCollectionList:[],
-				intoFileId:0,
-				alreadyStarIndex:0,
-				collectionParams:{
-					offset:0,
-					limit:5,
-					fileId:0
-				},
-				cancelloading:false,
-				addCollParams:{
-					offset:0,
-					limit:6,
-					fileId:0,
-					owner:''
-				},
-				addcollTotal:0,
+				collectionId:0,
+				commentList:[]
 			}
 		},
 		components: {
@@ -186,17 +178,13 @@
 			DiaLog,
 			BuyDiaLog,
 			SuccessDiaLog,
-			FallDiaLog
+			FallDiaLog,
+			FileList
 		},
 		created() {
 			this.$saoloading.show('Loading', 'ball');
-			this.fileId = this.$route.query.id
-			this.collectionParams.fileId= this.$route.query.id
-			this.addCollParams.owner=utils.getUser().EthAddr
-			this.addCollParams.fileId= this.$route.query.id
-			this.getfiledetails()
-			this.getCollectionLists()
-			this.getAboutComment()
+			this.collectionId = this.$route.query.id
+			// this.getfiledetails()
 			this.$checkConnectedAndNetwork().then(({
 				network,
 				connected
@@ -209,58 +197,13 @@
 					});
 				}
 			})
+			this.getCollectiondetails()
+			this.getAboutComment()
 		},
 		mounted() {
 			
-			this.$refs.scrollbar.handleScroll=()=>{
-			
-			        var wrap = this.$refs.scrollbar.wrap;
-			
-			        this.$refs.scrollbar.moveY = wrap.scrollTop * 100 / wrap.clientHeight;
-			
-			        this.$refs.scrollbar.moveX = wrap.scrollLeft * 100 / wrap.clientWidth;
-			
-			        let poor = wrap.scrollHeight - wrap.clientHeight
-			
-			        if( poor == parseInt(wrap.scrollTop) || poor == Math.ceil(wrap.scrollTop) || poor == Math.floor(wrap.scrollTop) ){
-			
-						if(this.tabNumber==2){
-			            this.cancelloading?'':this.loadMores()
-							
-						}
-			
-			        }
-			
-			    }
 		},
 		methods: {
-			loadMoreColl(){
-				if (this.addcollTotal > this.intoCollectionList.length) {
-					
-					this.addCollParams.offset = this.addCollParams.offset + this.addCollParams.limit
-					this.getaddCollectionList()
-				} 
-			},
-			loadMores() {
-				
-				if (this.fileParams.TotalCollections > this.collections.length) {
-					this.cancelloading = true
-					this.collectionParams.offset = this.collectionParams.offset + this.collectionParams.limit
-					this.getCollectionLists()
-				} else {
-					this.cancelloading = false
-				}
-			
-			},
-			CollectionFile(){
-				if(this.islogin){
-					this.showIntoCollection=true
-					this.getaddCollectionList()
-				}else{
-					this.login()
-				}
-			
-			},
 			getaddCollectionList(val){
 				let owner = utils.getUser().EthAddr
 				this.intoFileId=this.fileParams.Id
@@ -270,37 +213,43 @@
 					}
 					this.addcollTotal=res.data.Count
 					
+					console.log(res);
 				})
 				
 			},
 			checkAleadyStar(val){
 				this.fileParams.Star=val
+				this.collectionParams.offset=0
+				this.collections=[]
 				this.getCollectionLists()
 				
 			},
 			replyComment(data,val){
 				
 				var arr = Object.keys(data);
+				console.log('data',data);
+				console.log('val',val);
 				if(this.islogin){
 					
-				
 				if(arr.length==0){
 					// yiji
-					addFileComment({
+					addCollComment({
 						"comment": val,
-						"fileId": this.fileParams.Id,
+						"collectionId": Number(this.collectionId),
 						"parentId": 0
 					}).then(res=>{
+						console.log(res);
 						this.commentList.unshift(res.data)
 						this.fileParams.TotalComments++
 					})
 				}else{
 					// erji
-					addFileComment({
+					addCollComment({
 						"comment": val,
-						"fileId": this.fileParams.Id,
+						"collectionId": Number(this.collectionId),
 						"parentId": data.Id
 					}).then(res=>{
+						console.log(res);
 						let arr=res.data
 						arr.ParentComment={}
 						arr.ParentComment=data
@@ -314,12 +263,16 @@
 				}
 			},
 			deleteFileComments(val,index){
-				deleteFileComment(val.Id).then(res=>{
+				console.log(val);
+				console.log(index);
+				deleteCollComment(val.Id).then(res=>{
+					console.log(res);
 					this.commentList.splice(index,1)
 					this.fileParams.TotalComments--
 				})
 			},
 			getCollectionLists(){
+				
 				getCollectionList(this.collectionParams).then(res=>{
 					this.cancelloading=false
 					if(res.data.Count>0){
@@ -331,8 +284,8 @@
 				})
 			},
 			getAboutComment(){
-				getComment({
-					fileId:this.fileId
+				getCollComment({
+					collectionId:this.collectionId
 				}).then(res=>{
 					if(res.data){
 						
@@ -340,18 +293,21 @@
 					}else{
 						this.commentList=[]
 					}
+					console.log(res);
 				})
 			},
 			likeComments(val,index){
+				console.log(val);
 				if(this.islogin){
 					if(val.Liked==true){
 						
-						UnlikeComment(val.Id).then(res=>{
+						UnlikeCollComment(val.Id).then(res=>{
 							val.Liked=false
 							val.TotalLikes--
 						})
 					}else{
-						CommentLike(val.Id).then(res=>{
+						CollCommentLike(val.Id).then(res=>{
+							console.log(res);
 							val.Liked=true
 							val.TotalLikes++
 						})
@@ -363,6 +319,54 @@
 				
 			},
 			
+			
+			
+			addlike(boolean){
+				if(this.islogin){
+					this.fileParams.Liked = !this.fileParams.Liked
+					if(boolean){
+						this.fileParams.TotalLikes++
+						likeCollection(this.fileParams.Id).then(res=>{
+							console.log(res);
+						})
+						
+					}else{
+						deleteCollectionLike(this.fileParams.Id).then(res=>{
+							console.log(res);
+						})
+						this.fileParams.TotalLikes--
+					}
+				}else{
+					this.login()
+				}
+				
+			},
+			getCollectiondetails(){
+				getCollectionList({
+					collectionId:this.collectionId
+				}).then(res=>{
+					this.fileParams=res.data.Collections[0]
+					this.fileParams.CreatedAt = moment(new Date(res.data.Collections[0].CreatedAt)).format('YYYY-MM-DD')
+					this.fileParams.Labels = res.data.Collections[0].Labels.split(',')
+					this.$saoloading.hide();
+					this.getFileList()
+					console.log(res);
+				})
+			},
+			getFileList() {
+				// if (this.showlist == false) {
+				// 	this.showMarket = true
+			
+				// } else {
+				// 	this.showMarket = false
+				// }
+				this.fileinfoParams.collectionId=this.fileParams.Id
+				getCollectionFilelist(this.fileinfoParams).then(res => {
+					console.log(res);
+					this.CollectionList.push(...res.data)
+				}).catch()
+			},
+			getlogin(){},
 			login() {
 				this.dialogVisible = true;
 			},
@@ -485,6 +489,8 @@
 				font-size: 12px;
 
 				.filename {
+					display: flex;
+					align-items: center;
 					width: 570px;
 					word-wrap: break-word;
 					font-weight: 700;
@@ -609,8 +615,8 @@
 			}
 
 			.leftboardicon {
-				width: 18px;
-				height: 18px;
+				width: 16px;
+				height: 16px;
 				padding-right: 8px;
 			}
 
@@ -672,24 +678,16 @@
 		}
 
 		.Collection {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
 			width: 100%;
 			height: 100%;
 			min-height: 500px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
 			background: #070707;
 			padding-top: 24px;
-			.loading-box{
-				width: 100%;
-				height: 60px;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				.loadinggif {
-					width: 60px;
-					height: 60px;
-				}
+			.Collection-list{
+				max-width: 1072px;
 			}
 		}
 	}

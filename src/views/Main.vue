@@ -7,7 +7,11 @@
 
 				<div class="inputback">
 					<img class="searchimg" src="@/assets/images/Market/Group630.png" alt="" />
-					<el-input placeholder="Search by filename, tags, description, etc." v-model="input"></el-input>
+					<input type="text" class="el-input__inner" style="position: relative;z-index: 999;width: 335px;"  placeholder="Search by filename, tags, description, etc." v-model="input" @keydown.enter="gosearch">
+					    <span style="position: absolute;top: 12px;right: 10px;z-index: 9999;" @click="input=''" v-show="input"></span>
+					
+					
+					<!-- <el-input :clearable='true' @change='gosearch' placeholder="Search by filename, tags, description, etc." v-model="input"></el-input> -->
 				</div>
 			</div>
 			<!-- right userinfo&upload -->
@@ -102,11 +106,7 @@
 			});
 
 			this.$changeNetwork(res => {
-                let currentChainId = localStorage.getItem("chainId")
-                if (!currentChainId || parseInt(currentChainId) != _chainId) {
-                    localStorage.setItem("chainId", _chainId + '')
-                    window.location.reload()
-                }
+				location.reload();
 			});
 
 
@@ -148,11 +148,28 @@
 			})
 		},
 		methods: {
+			gosearch(){
+				console.log(this.input);
+				if(this.input===''){
+					return
+				}else{
+					let routeData = this.$router.resolve({
+						path: '/Search',
+						query: {
+							searchinfo: this.input
+						}
+					})
+					window.open(routeData.href, '_blank');
+				}
+				
+				// this.$router.push({path:'/Search',query:{searchinfo:this.input}})
+			},
 			getUserInfo() {
 				getUserProfile()
 					.then(res => {
 						console.log(res);
 						this.userinfo = res.data
+						localStorage.setItem(config.localStorageUserKey, JSON.stringify(res.data));
 					})
 					.catch(response => {
 						console.log(response);

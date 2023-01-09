@@ -1,5 +1,5 @@
 <template>
-	<el-scrollbar>
+	<el-scrollbar ref="scrollbar">
 		<div class="videofile">
 			<div v-if="islogin==true">
 				<div  v-if="fileParams.AlreadyPaid==false && fileParams.Price*1>0">
@@ -14,12 +14,11 @@
 							src="../../assets/images/Common/playing.png" alt="">
 						<img @click="handlePlay" class="pauseicon" v-show="showplayingicon"
 							src="../../assets/images/Common/pause.png" alt="">
+							<img v-if="loadingVideo" class="pauseicon" src="../../assets/images/Common/saoloading.gif" alt="">
 					</div>
 					<div class="videosize" v-else>
 						<video width="900" height="500" class="video" id="movie" ref="movie" 
 							:poster="fileParams.Preview" >
-					
-					
 						</video>
 					
 					</div>
@@ -35,19 +34,16 @@
 						src="../../assets/images/Common/playing.png" alt="">
 					<img @click="handlePlay" class="pauseicon" v-show="showplayingicon"
 						src="../../assets/images/Common/pause.png" alt="">
+						<img v-if="loadingVideo" class="pauseicon" src="../../assets/images/Common/saoloading.gif" alt="">
 				</div>
 			</div>
 			<div v-if="islogin==false">
 				<div class="videosize">
 					<video width="900" height="500" class="video" id="movie" ref="movie" 
 						:poster="fileParams.Preview" >
-				
-				
 					</video>
-				
 				</div>
 			</div>
-		
 			<!-- videoinfo -->
 			<div class="videoinfo">
 				<div class="filetitle">
@@ -89,7 +85,7 @@
 							<ActiveBtn @onClickBtn="buyprofile" :btnText="paynowbtnText" :btnstyle="middleSize" v-else>
 							</ActiveBtn>
 							
-							<div class="price">{{fileParams.Price}} BNB</div>
+							<div class="price">{{fileParams.Price}} ETH</div>
 				
 						</div>
 						
@@ -97,7 +93,7 @@
 				
 							<!-- <ActiveBtn @onClickBtn="gotodownload" :btnText="SolidbtnText" :btnstyle="middleSize">
 							</ActiveBtn> -->
-							<div class="price"> paid {{fileParams.Price}} BNB</div>
+							<div class="price"> paid {{fileParams.Price}} ETH</div>
 						</div>
 						<div class="nobuy" v-if="fileParams.Price==0">
 							
@@ -111,11 +107,13 @@
 				
 					</div>
 					<div class="leftboard">
-						<div class="boardicon"><img class="leftboardicon" src="@/assets/images/Common/star.png" alt="">
-							<span>10</span>
+						<div @click="CollectionFile" class="boardicon">
+							<img class="leftboardicon" v-if="fileParams.Star" src="@/assets/images/Common/star1.png" alt="">
+							<img class="leftboardicon" v-else src="@/assets/images/Common/star.png" alt="">
+						<span>{{fileParams.TotalCollections}}</span>
 						</div>
 						<div class="boardicon"><img class="commenticon" src="@/assets/images/Common/comment.png" alt="">
-							<span>1</span>
+							<span>{{fileParams.TotalComments}}</span>
 						</div>
 						<div class="shareicon"><img class="leftshareicon" src="@/assets/images/Common/share.png" alt="">
 				
@@ -124,11 +122,11 @@
 				</div>
 				<div class="changetab">
 					<div :class="tabNumber==1?'tabActive singletab':'singletab'" @click="showtabs(1)">
-						<span>Comments(1)</span>
+						<span>Comments({{fileParams.TotalComments}})</span>
 						<div v-if="tabNumber==1" class="activeBar"></div>
 					</div>
 					<div :class="tabNumber==2?'tabActive singletab':'singletab'" @click="showtabs(2)">
-						<span>Collection list(2)</span>
+						<span>Collection list({{fileParams.TotalCollections}})</span>
 						<div v-if="tabNumber==2" class="activeBar"></div>
 					</div>
 				</div>
@@ -138,10 +136,13 @@
 				<!-- tab -->
 				
 				<div class="Comments" v-show="tabNumber==1">
-					<Comment></Comment>
+					<Comment :commentList='commentList' @replyComment='replyComment' @deleteComment='deleteFileComments' @likeComment='likeComments'></Comment>
 				</div>
 				<div class="Collection" v-show="tabNumber==2">
-					<Favorites></Favorites>
+					<Favorites :favolist='collections'></Favorites>
+					<div v-show="cancelloading" class="loading-box">
+						<img class="loadinggif" src="@/assets/images/Common/saoloading.gif" alt="">
+					</div>
 				</div>
 			</div>
 
@@ -149,7 +150,7 @@
 		<DiaLog :visible.sync="dialogVisible" :title="DiaLogtitle">
 
 		</DiaLog>
-
+		<IntoCollection :visible.sync='showIntoCollection' @aleadyStar='checkAleadyStar' :checkList='intoCollectionList' :fileId='intoFileId' @loadMoreColl='loadMoreColl'></IntoCollection>
 		<BuyDiaLog :visible.sync="buyDialogVisible" @successbuy='successbuy' @buyingFall='buyingFall'
 			:title="BuyDiaLogtitle" :profileInfo='buyinginfo'></BuyDiaLog>
 		<SuccessDiaLog :visible.sync="successVisible" :title="BuySuccesstitle" :successBuyinginfo='successBuyinginfo'>
@@ -161,7 +162,7 @@
 <script>
 	import {
 		fileDetails,
-		download
+		download,getCollectionList,getComment,addFileComment,deleteFileComment,CommentLike,UnlikeComment
 	} from '../../api/FileApi.js'
 	import utils from '../../libs/utils.js'
 	import ActiveBtn from '../../components/ActiveBtn.vue'
@@ -175,6 +176,30 @@
 	export default {
 		data() {
 			return {
+				collectionParams:{
+					offset:0,
+					limit:5,
+					fileId:0
+				},
+				cancelloading:false,
+				addCollParams:{
+					offset:0,
+					limit:6,
+					fileId:0,
+					owner:''
+				},
+				addcollTotal:0,
+				
+				collections:[],
+				commentList:[],
+				showIntoCollection:false,
+				intoCollectionList:[],
+				intoFileId:0,
+				alreadyStarIndex:0,
+				
+				
+				
+				loadingVideo:false,
 				dialogVisible: false,
 				DiaLogtitle: "Connect wallet",
 				buyDialogVisible: false,
@@ -192,7 +217,9 @@
 
 				showPauseicon: false,
 				showplayingicon: true,
-				fileParams: {},
+				fileParams: {
+					FileExtension:''
+				},
 				tabNumber: 1,
 				SolidbtnText: 'PLAY',
 				paynowbtnText: 'BUY NOW',
@@ -211,17 +238,52 @@
 			SuccessDiaLog,
 			FallDiaLog
 		},
+		watch:{
+			showIntoCollection(old,news){
+				if(old==false){
+					this.intoCollectionList=[]
+					this.addCollParams.offset=0
+				}
+			}
+		},
 		mounted() {
 			this.$refs.movie.addEventListener('play', this.handlePlay)
 			this.$refs.movie.addEventListener('pause', this.handlePause)
-		
+			
+			this.$refs.scrollbar.handleScroll=()=>{
+			
+			        var wrap = this.$refs.scrollbar.wrap;
+			
+			        this.$refs.scrollbar.moveY = wrap.scrollTop * 100 / wrap.clientHeight;
+			
+			        this.$refs.scrollbar.moveX = wrap.scrollLeft * 100 / wrap.clientWidth;
+			
+			        let poor = wrap.scrollHeight - wrap.clientHeight
+			
+			        if( poor == parseInt(wrap.scrollTop) || poor == Math.ceil(wrap.scrollTop) || poor == Math.floor(wrap.scrollTop) ){
+			
+						if(this.tabNumber==2){
+			            this.cancelloading?'':this.loadMores()
+							
+						}
+			
+			        }
+			
+			    }
 		},
+
 		created() {
 			this.$saoloading.show('Loading', 'ball');
 			this.fileId = this.$route.query.id
+			this.collectionParams.fileId= this.$route.query.id
+			this.addCollParams.owner=utils.getUser().EthAddr
+			this.addCollParams.fileId= this.$route.query.id
 			this.getfiledetails()
-			this.getVideoUrl()
-			console.log(this.fileParams)
+			// this.getVideoUrl()
+			
+			this.getCollectionLists()
+			this.getAboutComment()
+			
 			this.$checkConnectedAndNetwork().then(({
 				network,
 				connected
@@ -236,6 +298,152 @@
 			})
 		},
 		methods: {
+			loadMoreColl(){
+				if (this.addcollTotal > this.intoCollectionList.length) {
+					
+					this.addCollParams.offset = this.addCollParams.offset + this.addCollParams.limit
+					this.getaddCollectionList()
+				} 
+			},
+			loadMores() {
+				
+				if (this.fileParams.TotalCollections > this.collections.length) {
+					this.cancelloading = true
+					this.collectionParams.offset = this.collectionParams.offset + this.collectionParams.limit
+					this.getCollectionLists()
+				} else {
+					this.cancelloading = false
+				}
+			
+			},
+			
+			CollectionFile(){
+				if(this.islogin){
+				this.showIntoCollection=true
+				this.getaddCollectionList()
+				}else{
+					this.login()
+				}
+			},
+			getaddCollectionList(val){
+				let owner = utils.getUser().EthAddr
+				this.intoFileId=this.fileParams.Id
+				getCollectionList(this.addCollParams).then(res=>{
+					if(res.data.Count>0){
+						this.intoCollectionList.push(...res.data.Collections)
+					}
+					this.addcollTotal=res.data.Count
+					
+					console.log(res);
+				})
+				
+			},
+			checkAleadyStar(val){
+				this.fileParams.Star=val
+				this.collectionParams.offset=0
+				this.collections=[]
+				this.getCollectionLists()
+				
+			},
+			replyComment(data,val){
+				console.log('data',data);
+				console.log('val',val);
+				var arr = Object.keys(data);
+				if(this.islogin){
+					
+				if(arr.length==0){
+					// yiji
+					addFileComment({
+						"comment": val,
+						"fileId": this.fileParams.Id,
+						"parentId": 0
+					}).then(res=>{
+						console.log(res);
+						this.commentList.unshift(res.data)
+						this.fileParams.TotalComments++
+					})
+				}else{
+					// erji
+					addFileComment({
+						"comment": val,
+						"fileId": this.fileParams.Id,
+						"parentId": data.Id
+					}).then(res=>{
+						console.log(res);
+						let arr=res.data
+						arr.ParentComment={}
+						arr.ParentComment=data
+						this.fileParams.TotalComments++
+						this.commentList.unshift(arr)
+						
+					})
+				}
+				}else{
+					this.login()
+				}
+			},
+			deleteFileComments(val,index){
+				console.log(val);
+				console.log(index);
+				deleteFileComment(val.Id).then(res=>{
+					console.log(res);
+					this.commentList.splice(index,1)
+					this.fileParams.TotalComments--
+				})
+			},
+			getCollectionLists(){
+				
+				getCollectionList(this.collectionParams).then(res=>{
+					this.cancelloading=false
+					if(res.data.Count>0){
+						this.collections.push(...res.data.Collections)
+						this.fileParams.TotalCollections=res.data.Count
+					}
+					
+					
+				})
+			},
+			getAboutComment(){
+				getComment({
+					fileId:this.fileId
+				}).then(res=>{
+					if(res.data){
+						
+					this.commentList=res.data
+					}else{
+						this.commentList=[]
+					}
+					console.log(res);
+				})
+			},
+			likeComments(val,index){
+				console.log(val);
+				if(this.islogin){
+					if(val.Liked==true){
+						
+						UnlikeComment(val.Id).then(res=>{
+							val.Liked=false
+							val.TotalLikes--
+						})
+					}else{
+						CommentLike(val.Id).then(res=>{
+							console.log(res);
+							val.Liked=true
+							val.TotalLikes++
+						})
+					
+					}
+				}else{
+					this.login()
+				}
+				
+			},
+			
+			
+			
+			
+			
+			
 			getfileTime(val) {
 				
 				let total = parseInt(val)
@@ -259,6 +467,7 @@
 				
 
 			},
+			
 			login() {
 				this.dialogVisible = true;
 			},
@@ -289,11 +498,11 @@
 				download(this.fileId).then(res => {
 					console.log(res.headers);
 					console.log(res.headers["content-disposition"]);
-
+					this.loadingVideo=false
 					const url = window.URL.createObjectURL(new Blob([res.data]));
-
+					
 					document.getElementById('movie').src = url;
-
+					this.$refs.movie.play()
 				})
 			},
 			getfiledetails() {
@@ -322,12 +531,22 @@
 			},
 			handlePlay() {
 				let _this = this
-				this.$refs.movie.play()
-				this.showplayingicon = false
-				this.showPauseicon = true
-				setTimeout(() => {
-					_this.showPauseicon = false
-				}, 1000)
+				let url = document.getElementById('movie').src
+				
+				if(url){
+					this.$refs.movie.play()
+					this.showplayingicon = false
+					this.showPauseicon = true
+					setTimeout(() => {
+						_this.showPauseicon = false
+					}, 1000)
+				}else{
+					this.showplayingicon = false
+					this.showPauseicon = false
+					this.loadingVideo=true
+					this.getVideoUrl()
+				}
+				
 			},
 			handlePause() {
 				this.$refs.movie.pause()
@@ -528,7 +747,7 @@
 					font-size: 12px;
 					padding: 0 10px;
 					margin-left: 5px;
-			
+					cursor: pointer;
 					.commenticon {
 						width: 18px;
 						height: 16px;
@@ -605,6 +824,17 @@
 
 			.Collection {
 				padding-top: 10px;
+				.loading-box{
+					width: 100%;
+					height: 60px;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					.loadinggif {
+						width: 60px;
+						height: 60px;
+					}
+				}
 			}
 		}
 	}

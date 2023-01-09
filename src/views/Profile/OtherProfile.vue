@@ -22,28 +22,33 @@
 								</div>
 								<div class="userfinenumber">
 									<div class="finenumber">
-										<span class="finenumberdetails">{{userSummary.PublicUploads}}
+										<span class="finenumberdetails">{{userinfo.TotalUploads}}
 										</span><span>Files</span>
 									</div>
 									<div class="finenumber">
-										<span class="finenumberdetails">{{userSummary.Collections}}
+										<span class="finenumberdetails">{{userinfo.TotalCollections}}
 										</span><span>Collections</span>
+									</div>
+									<div class="finenumber followhands" @click="checkfollw(0)">
+										<span class="finenumberdetails">{{userinfo.TotalFollowings}}
+										</span><span>Following</span>
+									</div>
+									<div class="finenumber followhands"  @click="checkfollw(1)">
+										<span class="finenumberdetails">{{userinfo.TotalFollowers}}
+										</span><span>Follower</span>
 									</div>
 								</div>
 							</div>
 						</div>
 						<div class="rightBtn">
-							<ActiveBtn @onClickBtn="edituserinfo" :btnText='btnText' :btnstyle='btnstyle'></ActiveBtn>
-							<MiniHollowBtn class="Disconnectbtn" @MHoBtn='Disconnect' :btnstyle='hollowstyle'>
+							<ActiveBtn v-show="!userinfo.Followed" @onClickBtn="addfollow" :btnText='btnText' :btnstyle='btnstyle'></ActiveBtn>
+							<MiniHollowBtn v-show="userinfo.Followed" class="Disconnectbtn" @MHoBtn='cancelFollow' :btnstyle='hollowstyle'>
 								<div slot="btncontent" class="deletebtn">
-									<span>Disconnect</span>
+									<span>- Following</span>
 								</div>
 							</MiniHollowBtn>
 
-							<!-- <div class="Disconnect">
-							<img src="@/assets/images/Profile/redbtn.png" alt="">
-							<span class="Disconnecttext">Disconnect</span>
-						</div> -->
+							
 
 						</div>
 					</div>
@@ -57,7 +62,6 @@
 					<div :class="tabNumber==1?'tabActive singletab':'singletab'" @click="showtabs(1)">
 						<span>Home</span>
 
-						<!-- <div  :class="tabNumber==1?'activeBar':''"></div> -->
 
 						<div v-if="tabNumber==1" class="activeBar"></div>
 
@@ -68,8 +72,6 @@
 
 						<div v-if="tabNumber==2" class="activeBar"></div>
 
-
-						<!-- <div :class="tabNumber==2?'activeBar':''"></div> -->
 					</div>
 					<div :class="tabNumber==3?'tabActive singletab':'singletab'" @click="showtabs(3)">
 						<span>Uploads</span>
@@ -77,15 +79,12 @@
 						<div v-if="tabNumber==3" class="activeBar"></div>
 
 
-						<!-- <div :class="tabNumber==3?'activeBar':''"></div> -->
 					</div>
 					<div :class="tabNumber==4?'tabActive singletab':'singletab'" @click="showtabs(4)">
 						<span>Purchases</span>
 
 						<div v-if="tabNumber==4" class="activeBar"></div>
 
-
-						<!-- <div  :class="tabNumber==4?'activeBar':''"></div> -->
 					</div>
 
 				</div>
@@ -93,99 +92,6 @@
 
 				<div class="tabNumber1" v-if="tabNumber==1">
 					<div class="tabNumberHome">
-						<!-- <div class="homehead">
-							<div>
-								<img class="homeheadicon" src="@/assets/images/Profile/data.png" alt="">
-								<span>Data</span>
-							</div>
-						
-						</div>
-						<div class="user-information">
-							<div class="user-infodetails">
-								<span class="infostitle">Storage Space </span>
-								<span class="infosmain" v-if='userSummary.SpaceUsed>=0'>
-									{{userSummary.SpaceUsed}}G/{{userSummary.SpaceQuota}}G </span>
-								<span class="infosmain" v-else>-</span>
-							</div>
-							<div class="user-infodetails">
-								<span class="infostitle">Applications </span>
-								<span class="infosmain"
-									v-if='userSummary.Applications>=0'>{{userSummary.Applications}}</span>
-								<span class="infosmain" v-else>-</span>
-							</div>
-							<div class="user-infodetails">
-								<span class="infostitle">Total Uploads (Public)</span>
-								<span class="infosmain"
-									v-if='userSummary.TotalUploads>=0'>{{userSummary.TotalUploads}}</span>
-								<span class="infosmain" v-else>-</span>
-							</div>
-							<div class="user-infodetails">
-								<span class="infostitle">Total Purchases </span>
-								<span class="infosmain"
-									v-if='userSummary.PurchasesFiles>=0'>{{userSummary.PurchasesFiles}}</span>
-								<span class="infosmain" v-else>-</span>
-							</div>
-							<div class="user-infodetails">
-								<span class="infostitle">Collections </span>
-								<span class="infosmain"
-									v-if='userSummary.Collections>=0'>{{userSummary.Collections}}</span>
-								<span class="infosmain" v-else>-</span>
-							</div>
-						</div> -->
-						<div class="homehead">
-							<div>
-								<img class="homeheadicon" src="@/assets/images/Profile/data.png" alt="">
-								<span>Dashboard</span>
-							</div>
-
-						</div>
-						<div class="user-information Dashboardinfo">
-							<div class="user-infodetails">
-								<span class="infostitle">Total Paid </span>
-								<span class="infosmain" v-if='userSummary.TotalPaid>=0'>
-									{{userSummary.TotalPaid}} ETH
-								</span>
-
-								<span class="infosmain" v-else>-</span>
-							</div>
-							<div class="user-infodetails">
-								<span class="infostitle">Total Purchased </span>
-								<span class="infosmain" v-if='userSummary.PurchasesFiles>=0'>
-									{{userSummary.PurchasesFiles}}
-								</span>
-
-								<span class="infosmain" v-else>-</span>
-
-							</div>
-							<div class="user-infodetails">
-								<span class="infostitle">Total Earned</span>
-								<span class="infosmain" v-if='userSummary.TotalEarned>=0'>
-									{{userSummary.TotalEarned}} ETH
-								</span>
-
-								<span class="infosmain" v-else>-</span>
-							</div>
-							<div class="user-infodetails">
-								<span class="infostitle">Total Sold </span>
-								<span class="infosmain" v-if='userSummary.SellFiles>=0'>
-									{{userSummary.SellFiles}}
-								</span>
-
-								<span class="infosmain" v-else>-</span>
-
-							</div>
-							<div class="user-infodetails">
-								<span class="infostitle">Available Claim </span>
-								<span class="infosmain" v-if='userinfo.balance >=0'>
-									{{userinfo.balance }} ETH
-								</span>
-
-								<span class="infosmain" v-else>-</span>
-							</div>
-							<ActiveBtn v-if="userinfo.balance != '0'" @onClickBtn="claimnow" :btnText='claimbtnText'
-								:btnstyle='btnstyle'></ActiveBtn>
-							<InactiveButton v-else :btnText='claimbtnText' :btnstyle='claimstyle'></InactiveButton>
-						</div>
 						<div class="homehead">
 							<div>
 								<img class="homeheadicon" src="@/assets/images/Profile/data.png" alt="">
@@ -197,7 +103,7 @@
 						</div>
 						<div class="homeFileList">
 
-							<FileList v-if='FileMarketList.length>0'  :FileList='FileMarketList' @loginwallet='getlogin'>
+							<FileList v-if='FileMarketList.length>0' :FileList='FileMarketList' @loginwallet='getlogin'>
 							</FileList>
 							<div class='nofiles' v-else>
 								<img class="nofilesicon" src="@/assets/images/Profile/nofiles.png" alt="">
@@ -246,33 +152,13 @@
 							<img class="homeheadicon" src="@/assets/images/Profile/data.png" alt="">
 							<span>Collection list</span>
 						</div>
-						<div class="Collectionhead-right" @click='CreateCollection'>
-							<span>+ Create Collection</span>
-							<img class="hollowwalletBtnback" src="../../assets/images/Common/walletinfo.png" alt="" />
-						</div>
-					</div>
-					<div class="homeFileList">
-
-						
-						<Favorites v-if="collections.length>0" :favolist='collections' :isMine='isMine' @confirmDeleteColl='confirmDeleteColl' @updatecoll='getcollAgain'></Favorites>
-						<div class='nofiles' v-else>
-							<img class="nofilesicon" src="@/assets/images/Profile/nofiles.png" alt="">
-							<span class="nofilestxt">
-								No collections
-							</span>
-						</div>
-					</div>
-					<div class="Collectionhead" style="margin: 13px 0;">
-						<div class="Collectionhead-left">
-							
-							<span>Liked</span>
-						</div>
 						
 					</div>
+					
 					<div class="homeFileList">
 					
 						
-						<Favorites v-if="likeCollections.length>0" :favolist='likeCollections'  @confirmDeleteColl='confirmDeleteColl' @updatecoll='getcollAgain'></Favorites>
+						<Favorites v-if="collections.length>0" :favolist='collections' ></Favorites>
 						<div class='nofiles' v-else>
 							<img class="nofilesicon" src="@/assets/images/Profile/nofiles.png" alt="">
 							<span class="nofilestxt">
@@ -313,30 +199,30 @@
 
 
 			</div>
-			<transition name="dialog-fade">
-				<EditUser v-if="eiditVisible" :visible.sync="eiditVisible" :userinfo='userinfo'></EditUser>
-			</transition>
-			<AddCollection  :visible.sync="AddCollectionVisible" @getlistagain='getcollAgain'></AddCollection>
+			
+			<AddCollection  :visible.sync="AddCollectionVisible"></AddCollection>
+			
+			<Followings :title='followtitle' :followList='followList' :visible.sync="FollowVisible"></Followings>
 		</div>
 	</el-scrollbar>
 </template>
 
 <script>
 	import {
-		getUserProfile,
-		update,
+		getOtherUserinfo,
 		getUserDashboard,
-		getUserSummary,
-		getUserPurchases
+		getUserPurchases,
+		followUser,
+		cancelFollowing,
+		getUserFollower,
+		getUserFollowing
 	} from "../../api/UserApi.js";
 	import {
 		fileInfos,
 		download,
 		cancelUpload,
 		addFileWithPreview,
-		getCollectionList,
-		deleteCollection,
-		getLikedCollection
+		getCollectionList
 	} from "../../api/FileApi.js";
 
 	import config from "../../libs/config.js";
@@ -349,6 +235,7 @@
 	import FileList from "@/components/FileList.vue";
 	import EditUser from '@/components/EditUser.vue'
 	import AddCollection from '@/components/AddCollection.vue'
+	import Followings from '@/components/Followings.vue'
 	export default {
 
 		data() {
@@ -369,7 +256,7 @@
 					fontSize: "14px"
 				},
 				activeName: "one",
-				btnText: "Edit",
+				btnText: "+ Follow",
 				claimbtnText: 'Claim',
 				btnstyle: 'small',
 				claimstyle: {
@@ -383,68 +270,26 @@
 					fileNumber: "310",
 					balance: 0
 				},
-				userSummary: {},
 				FileMarketList: [
 
 				],
 				DownloadedList: [],
 				allFileMarketList: [],
 				allDownloadedList: [],
-				collections:[],
-				isMine:true,
-				likeCollParams:{
-					address:'',
-					offset:0,
-					limit:10
-				},
-				likeCollections:[]
+				FollowVisible:false,
+				followtitle:'Follower',
+				followList:[],
+				collections:[]
 			};
 		},
+		created(){
+			let profileaddress = this.$route.query.address
+			this.getOtherProfile(profileaddress)
+			this.getUserDashboards(profileaddress)
+			this.getUserPurchases(profileaddress)
+		},
 		mounted() {
-			this.$checkConnectedAndNetwork().then(({
-				network,
-				connected
-			}) => {
-				if (connected) {
-					this.$getWalletAddress().then(address => {
-						if (address) {
-							
-							let currentSign = utils.getCurrentSign(address);
-							if (!currentSign) {
-								let signaturemessage = config.signMessage + address;
-								this.$sign(signaturemessage, address)
-									.then(signature => {
-										let sign = {
-											address,
-											signaturemessage,
-											signature
-										};
-										localStorage.setItem(config.localStorageSignKey, JSON
-											.stringify(sign));
-										utils.setSignList(sign);
-										this.getUserInfo(address)
-										this.getUserDashboard()
-										this.getSummary()
-										this.getUserPurchases()
-										
-									})
-									.catch(() => {
-										location.reload();
-									});
-							} else {
-								localStorage.setItem(config.localStorageSignKey, JSON.stringify(
-									currentSign));
-								this.getUserInfo(address)
-								this.getUserDashboard()
-								this.getSummary()
-								this.getUserPurchases()
-							}
-						}
-					});
-				} else {
-					location.href = "https://harmonious-treacle-9cadd3.netlify.app";
-				}
-			})
+			
 		},
 		components: {
 			MiniHollowBtn,
@@ -453,77 +298,67 @@
 			FileList,
 			EditUser,
 			AddCollection,
-			Favorites
+			Favorites,
+			Followings
 		},
 		
 		methods: {
-			getLikedCollections(){
-				getLikedCollection(this.likeCollParams).then(res=>{
-					console.log(res);
-					if(res.data.Count>0){
-					this.likeCollections.push(...res.data.Collections)
-					}
-				})
+			checkfollw(val){
+				console.log(val);
+				this.FollowVisible=true
+					this.followList=[]
+				if(val==1){
+					this.followtitle='Follower'
+					getUserFollower({
+						address:this.userinfo.EthAddr
+					}).then(res=>{
+						console.log(res);
+						if(res.data){
+						this.followList=res.data
+						}else{
+							this.followList=[]
+						}
+					})
+				}else{
+					this.followtitle='Following'
+					getUserFollowing({
+						address:this.userinfo.EthAddr
+					}).then(res=>{
+						if(res.data){
+						this.followList=res.data
+						}else{
+							this.followList=[]
+						}
+					})
+				}
 			},
-			confirmDeleteColl(val){
-				this.collections=this.collections.filter(item=>{
-					return item.Id !== val.Id
-				})
-				// deleteCollection({
-				// 	collectionId:val.Id
-				// }).then(res=>{
-				// 	console.log(res);
-				// })
-				deleteCollection(val.Id).then(res=>{
+			getOtherProfile(address){
+				getOtherUserinfo({
+					address:address
+				}).then(res=>{
 					console.log(res);
+					this.userinfo = res.data
 				})
 			},
 			CreateCollection() {
 				console.log(111);
 				this.AddCollectionVisible = true
 			},
-			claimnow() {
-				this.$checkConnectedAndNetwork().then(({
-					network,
-					connected
-				}) => {
-					this.ChangeRinkebyVisible = !network && network !== undefined;
-					if (network) {
-						this.claim(this.userinfo.EthAddr);
-					} else {
-						this.$message.error('please connect wallet');
-					}
-				});
+			
+			cancelFollow() {
+				cancelFollowing(this.userinfo.EthAddr).then(res=>{
+					this.userinfo.Followed=false
+					this.userinfo.TotalFollowers--
+				})
 			},
-			claim(address) {
-				this.$contractClaim(address, res => {
+			addfollow(){
+				followUser(this.userinfo.EthAddr).then(res=>{
 					console.log(res);
-					if (res === 4) {
-						this.$emit('successbuy', this.profileInfo);
-					}
-					if (res == 'error') {
-						this.$emit('claim failed', this.profileInfo);
-					}
-				});
+					this.userinfo.Followed=true
+					this.userinfo.TotalFollowers++
+				})
 			},
-			Disconnect() {
-				this.$disconnect();
-
-				location.href = "https://harmonious-treacle-9cadd3.netlify.app";
-			},
-			getSummary() {
-				getUserSummary()
-					.then(res => {
-						this.userSummary = res.data
-					})
-					.catch(response => {
-						console.log(response);
-					})
-			},
-			edituserinfo() {
-				console.log(this.userinfo)
-				this.eiditVisible = true
-			},
+			
 
 
 			getUserInfo(address) {
@@ -535,38 +370,28 @@
 							this.userinfo.balance = Web3.utils.fromWei(result + "", 'ether')
 							console.log("userifo", this.userinfo)
 						})
-						this.likeCollParams.address=res.data.EthAddr
 					})
 					.catch(response => {
 						console.log(response);
 					});
 
 			},
-			getUserDashboard() {
-				getUserDashboard()
-					.then(res => {
-						console.log(res);
-						if (res.data.RecentUploads != null) {
-							let list = res.data.RecentUploads;
-							this.allFileMarketList = list
-							this.userinfoloading = false
-							if (list.length > 4) {
-								this.FileMarketList = list.slice(0, 4);
-							}
-							if (list.length > 0 && list.length <= 4) {
-								this.FileMarketList = list;
-							}
-						} else {
-							this.userinfoloading = false
-							this.allFileMarketList = []
-							this.FileMarketList = []
-						}
-
-					})
-					.catch();
+			getCollectionLists(){
+				
+				getCollectionList({owner:this.userinfo.EthAddr}).then(res=>{
+					console.log(res);
+					if(res.data.Count>0){
+						
+					this.collections.push(...res.data.Collections)
+					}
+					
+				})
 			},
-			getUserPurchases() {
-				getUserPurchases().then(res => {
+				
+			getUserPurchases(address) {
+				getUserPurchases({
+					address:address
+				}).then(res => {
 					if (res.data.Purchases != null) {
 						let list = res.data.Purchases;
 						this.allDownloadedList = list
@@ -586,20 +411,30 @@
 				}).catch()
 			},
 			getlogin() {},
-			manageUser() {},
-			getcollAgain(){
-				this.collections=[]
-				this.getCollectionLists()
-			},
-			getCollectionLists(){
-				getCollectionList({owner:this.userinfo.EthAddr}).then(res=>{
-					console.log(res.data.Count);
-					if(res.data.Count>0){
-						
-					this.collections.push(...res.data.Collections)
-					}
-					
+			getUserDashboards(address) {
+				getUserDashboard({
+					address:address
 				})
+					.then(res => {
+						console.log(res);
+						if (res.data.RecentUploads != null) {
+							let list = res.data.RecentUploads;
+							this.allFileMarketList = list
+							this.userinfoloading = false
+							if (list.length > 4) {
+								this.FileMarketList = list.slice(0, 4);
+							}
+							if (list.length > 0 && list.length <= 4) {
+								this.FileMarketList = list;
+							}
+						} else {
+							this.userinfoloading = false
+							this.allFileMarketList = []
+							this.FileMarketList = []
+						}
+			
+					})
+					.catch();
 			},
 			showtabs(val) {
 				this.tabNumber = val;
@@ -608,7 +443,6 @@
 					this.likeCollections=[]
 					this.likeCollParams.offset=0
 					this.getCollectionLists()
-					this.getLikedCollections()
 				}
 			},
 			copyNumber(item) {
@@ -804,7 +638,7 @@
 
 					.user-details {
 						width: 80%;
-						overflow: hidden;
+						// overflow: hidden;
 						position: relative;
 						font-size: 14px;
 
@@ -858,14 +692,25 @@
 
 						.finenumber {
 							padding-right: 20px;
+							border-right: 1px solid #57b196;
+							padding-left: 20px;
+							span{
+								
+							}
+						}
+						.followhands{
+							cursor: pointer;
 						}
 
 						.finenumberdetails {
 							color: #58FFC3
 						}
-
-						.finenumber:nth-child(2) {
-							border-left: 1px solid #57b196;
+						.finenumber:nth-child(1) {
+							// border-right: none;
+							padding-left: 0px;
+						}
+						.finenumber:nth-child(4) {
+							border-right: none;
 							padding-left: 20px;
 						}
 					}

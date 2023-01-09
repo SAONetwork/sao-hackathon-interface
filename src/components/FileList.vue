@@ -22,11 +22,11 @@
 						<img src="@/assets/images/Market/wallet1.png" alt="">
 					</div>
 				</div>
-				<img class="iscoll" @click.stop="cancelcol(item,index)" v-if="item.iscol==true && islogin==true" src="@/assets/images/Market/col.png"
+				<img class="iscoll" @click.stop="cancelcol(item,index)" v-if="item.Star==true && islogin==true" src="@/assets/images/Market/col.png"
 					alt="">
-				<img class="iscoll" @click.stop="colthisFile(item,index)" v-if="item.iscol==false  && islogin==true" src="@/assets/images/Market/nocol.png"
+				<img class="iscoll" @click.stop="colthisFile(item,index)" v-if="item.Star==false  && islogin==true" src="@/assets/images/Market/nocol.png"
 					alt="">
-				<img class="iscoll" v-if="islogin==false"   src="@/assets/images/Market/nocol.png" alt="">
+				<img class="iscoll" v-if="islogin==false" @click.stop="login"  src="@/assets/images/Market/nocol.png" alt="">
 
 				<div class="filetextinfo">
 					<div class="filename">
@@ -66,7 +66,7 @@
 
 				<div class="nobuy" v-if="item.Price>0 && item.AlreadyPaid==false">
 					<el-tooltip :content="item.Price+''" placement="top">
-						<div class="price">{{item.Price | numRounding}} BNB</div>
+						<div class="price">{{item.Price | numRounding}} ETH</div>
 					</el-tooltip>
 					<HollowBtn class="shadow" @BHoBtn='Download(item)' v-if="item.EthAddr.toLowerCase()==address" :btnSize='smallbtnSize'>
 						<div slot="btncontent" class="HollowBtn">
@@ -121,8 +121,10 @@
 				</div>
 			</div>
 		</li>
-
+		
+<IntoCollection :visible.sync='showIntoCollection' @aleadyStar='checkAleadyStar' :checkList='intoCollectionList' :fileId='intoFileId' @loadMoreColl='loadMoreColl'></IntoCollection>
 	</ul>
+	
 	<!-- </el-scrollbar> -->
 
 
@@ -133,18 +135,20 @@
 		fileInfos,
 		download,
 		cancelUpload,
-		addFileWithPreview
+		addFileWithPreview,
+		getCollectionList
 	} from "../api/FileApi.js"
 
 	import config from "../libs/config.js"
 	import utils from "../libs/utils.js"
 	import HollowBtn from "@/components/HollowBtn.vue";
 	import ActiveBtn from "@/components/ActiveBtn.vue";
-
+	import AddCollection from '@/components/AddCollection.vue'
 	export default {
 		components: {
 			HollowBtn,
-			ActiveBtn
+			ActiveBtn,
+			AddCollection
 		},
 		props: {
 			FileList: {
@@ -160,8 +164,27 @@
 				islogin: false,
 				address: '',
 				btnSize:'big',
-				smallbtnSize:'small'
+				smallbtnSize:'small',
+				showIntoCollection:false,
+				intoCollectionList:[],
+				intoFileId:0,
+				alreadyStarIndex:0,
+				addCollParams:{
+					offset:0,
+					limit:6,
+					fileId:0,
+					owner:''
+				},
+				intoCount:0
 			};
+		},
+		watch:{
+			showIntoCollection(old,news){
+				if(old==false){
+					this.intoCollectionList=[]
+					this.addCollParams.offset=0
+				}
+			}
 		},
 		filters: {
 			numRounding(num) {
@@ -186,12 +209,44 @@
 				}
 			})
 		},
+		created() {
+			this.addCollParams.owner= utils.getUser().EthAddr
+		},
 		methods: {
+			loadMoreColl(){
+				if (this.intoCount > this.intoCollectionList.length) {
+					
+					this.addCollParams.offset = this.addCollParams.offset + this.addCollParams.limit
+					this.getCollectionLists(this.intoFileId,this.alreadyStarIndex)
+				} 
+			},
+			checkAleadyStar(starStatus){
+				this.FileList[this.alreadyStarIndex].Star= starStatus
+			},
+			getCollectionLists(val,index){
+				this.intoFileId=val
+				this.addCollParams.fileId=val
+				getCollectionList(this.addCollParams).then(res=>{
+					this.intoCount=res.data.Count
+					if(res.data.Count>0){
+						let arr=res.data.Collections
+						this.intoCollectionList=this.intoCollectionList.concat(arr)
+					}
+				})
+				this.alreadyStarIndex=index
+			},
 			colthisFile(item,index){
-				item.iscol=true
+				this.intoFileId=item.Id
+				this.showIntoCollection=true
+				this.getCollectionLists(item.Id,index)
+				// item.Star=true
 			},
 			cancelcol(item,index){
-				item.iscol=false
+				console.log(item);
+				this.intoFileId=item.Id
+				// item.Star=false
+				this.showIntoCollection=true
+				this.getCollectionLists(item.Id,index)
 			},
 			extraPrice(str) {
 				return str.replace(/^(\-)*(\d+)\.(\d\d\d\d).*$/)
