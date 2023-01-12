@@ -10,7 +10,7 @@ const install = () => {
 	Vue.prototype.$changeWalletAddress = (callBack) => {
 		if (window.ethereum) {
 			ethereum.on("accountsChanged", (accounts) => {
-				console.log("accounts:", accounts);
+				
 				callBack(accounts[0]);
 			});
 		}
@@ -31,7 +31,7 @@ const install = () => {
 			await (window.ethereum).request({
 				method: 'wallet_switchEthereumChain',
 				params: [{
-					chainId: config.defaultChainId,
+					chainId: config.defaultChainId
 				}]
 			})
 			callBack("success")
@@ -77,14 +77,14 @@ const install = () => {
 				method: 'eth_chainId'
 			});
 
-			console.log("chainId:", chainId);
+			
 
             //const address = window.ethereum.selectedAddress;
 			const res = await window.ethereum.request({
 				method: "eth_accounts"
 			})
             let address = res[0]
-			console.log("selectedAddress:", address);
+			
 			
 			if (localStorage.getItem("disconnect")) {
 				address = null;
@@ -146,7 +146,7 @@ const install = () => {
 					callback(confirmationNumber);
 				})
 				.on('receipt', (receipt) => {
-					console.log(receipt);
+					
 				})
 				.on('error', (error) => {
 					callback("error");
@@ -167,7 +167,7 @@ const install = () => {
 					callback(confirmationNumber);
 				})
 				.on('receipt', (receipt) => {
-					console.log(receipt);
+					
 				})
 				.on('error', (error) => {
 					callback("error");
@@ -187,7 +187,7 @@ const install = () => {
 					callback(confirmationNumber);
 				})
 				.on('receipt', (receipt) => {
-					console.log(receipt);
+					
 				})
 				.on('error', (error) => {
 					callback("error");

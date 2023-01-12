@@ -1,7 +1,7 @@
 <template>
 	<div>
-		<DeleteDialog :visible.sync='showDelete' :title="deleteTitle" @confirmDelete='confirmDelete'></DeleteDialog>
-		<AddCollection  :visible.sync="AddCollectionVisible" :editCollection='readyEditColl' @getlistagain='getcollAgain'></AddCollection>
+		<DeleteDialog :visible.sync='showDelete' :title="deleteTitle" :isfile='deleteisFile' @confirmDelete='confirmDelete'></DeleteDialog>
+		<AddCollection  :visible.sync="AddCollectionVisible" :editCollection='readyEditColl' @getlistagain='getcollAgain' :title="addTitle"></AddCollection>
 	<ul class="favorites">
 		<li class="singlefavo" v-for="(item,index) in favolist" :key="index" @click.stop='gotodetails(item)'>
 			<div class="singlefavo-left">
@@ -22,7 +22,7 @@
 						<div class="favotags">
 							<span class="singletig" v-for="(v,i) in chanLabel(item.Labels).splice(0,5)" :key="i">{{v}}</span>
 						</div>
-						<el-popover placement="right" width="300"  trigger="hover" popper-class="popoverBackB"
+						<el-popover placement="right" width="300"  trigger="hover" popper-class="popoverBackA"
 							v-if="chanLabel(item.Labels).length>5">
 							<el-scrollbar> 
 							<div class="showtigs">
@@ -84,9 +84,11 @@
 			return{
 				showDelete:false,
 				AddCollectionVisible:false,
-				deleteTitle:'Delete file',
+				deleteTitle:'Delete collection',
+				deleteisFile:'collection',
 				readyDelete:{},
 				readyEditColl:{},
+				addTitle:'Manage'
 				// favolist:[
 				// ]
 			}
@@ -124,14 +126,13 @@
 			},
 			editColl(item,index){
 				this.readyEditColl=item
-				console.log(this.readyEditColl);
 				this.AddCollectionVisible=true
 			}
 		}
 	}
 </script>
 <style>
-	.popoverBackB {
+	.popoverBackA {
 		height: 250px;
 		padding: 12px;
 		box-sizing: border-box;

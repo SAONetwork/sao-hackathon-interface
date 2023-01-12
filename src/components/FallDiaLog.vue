@@ -92,7 +92,7 @@
 			};
 		},
 		created() {
-			console.log(this.successBuyinginfo);
+			
 		},
 		methods: {
 			cancleDialog() {
@@ -100,7 +100,7 @@
 			},
 
 			buynow() {
-				console.log(this.fallBuyinginfo);
+				
 				this.$checkConnectedAndNetwork().then(({network, connected}) => {
 					this.ChangeRinkebyVisible = !network && network !== undefined;
 					
@@ -148,7 +148,6 @@
 					this.fallBuyinginfo.Price * 1,
 					address,
 					res => {
-						console.log(res);
 						if (res === 4) {
 							this.$saoloading.hide();
 							// this.$emit("update:visible", false);

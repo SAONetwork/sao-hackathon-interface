@@ -178,7 +178,7 @@
 				window.open(routeData.href, '_blank');
 			},
 			gotoReply(){
-				console.log(this.otherComment);
+				
 				this.$emit('replyComment',this.otherComment,this.myComment)
 				this.otherComment={}
 				this.myComment=''

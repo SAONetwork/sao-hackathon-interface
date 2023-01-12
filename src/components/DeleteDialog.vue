@@ -12,7 +12,7 @@
 				</div>
 				<div class="dialogmain">
 					<div class="dialog-content">
-						<p>You are deleting this file. Do you want to continue?</p>
+						<p>You are deleting this {{isfile}}. Do you want to continue?</p>
 					</div>
 					<div class="btn">
 						<BorderBtn class="padingstyle" @onClickBtn="cancleDialog" :btnText='BorderbtnText' :btnstyle='uploadbtnstyle'>
@@ -48,7 +48,11 @@ import ActiveBtn from "./ActiveBtn";
 			},
 			title: {
 				type: String,
-				default: ''
+				default: 'Delete file'
+			},
+			isfile:{
+				type: String,
+				default: 'file'
 			}
 		},
 		components:{

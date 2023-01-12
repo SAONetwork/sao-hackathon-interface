@@ -20,7 +20,7 @@
 							
 						</div>
 						<div class="filemessage">
-							<span class="fileEthAddr infostyle">{{testfile(fileParams.EthAddr)}}</span>
+							<span class="fileEthAddr infostyle" @click="gotoProfile">{{testfile(fileParams.EthAddr)}}</span>
 							<div class="gap"></div>
 							<span class="infostyle"> Uploaded at&nbsp;{{fileParams.CreatedAt}}</span>
 							<div class="gap"></div>
@@ -58,10 +58,39 @@
 										alt="">
 									<span>{{fileParams.TotalComments}}</span>
 								</div>
-								<div class="shareicon"><img class="leftshareicon" src="@/assets/images/Common/share.png"
-										alt="">
-
-								</div>
+								<el-popover
+								  placement="right-start"
+								  width="210"
+								  trigger="hover"
+								   popper-class="popoverBackB"
+								  >
+									<div class="shareBroad">
+										<div class="single-share">
+											<a
+											        href="javascript:window.open('http://twitter.com/home?status='+encodeURIComponent(document.location.href)+' '+encodeURIComponent(document.title),'_blank','toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=600, height=450,top=100,left=350');void(0)">
+											       <img class="twitter" src="@/assets/images/Market/twitter.png" alt=""> Share to Twitter </a>
+											
+										</div>
+										<div class="single-share">
+											
+											 <a
+											        href="javascript:window.open('http://www.facebook.com/sharer.php?u='+encodeURIComponent(document.location.href),'_blank','toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=600, height=450,top=100,left=350');void(0)">
+											        <img  class="facebook"  src="@/assets/images/Market/facebook.png" alt="">
+													Share to Facebook
+											
+											</a>
+										</div>
+										<div class="single-share" @click="getCopyUrl">
+											<img  class="sharelink" src="@/assets/images/Market/sharelink.png" alt="">
+											<span v-show="!iscopy">Copy link</span>
+											
+											<span v-show="iscopy">Copied</span>
+										</div>
+									</div>
+								  <div slot="reference" class="shareicon"><img class="leftshareicon" src="@/assets/images/Common/share.png" alt="">
+								  </div>
+								  
+								</el-popover>
 							</div>
 						</div>
 					</div>
@@ -81,13 +110,25 @@
 			<!--  -->
 			<div class="Comments" v-show="tabNumber==2">
 				<Comment :commentList='commentList' @replyComment='replyComment' @deleteComment='deleteFileComments' @likeComment='likeComments'></Comment>
+				<div class='nofiles' v-if="commentList.length==0">
+					<img class="nofilesicon" src="@/assets/images/Profile/nofiles.png" alt="">
+					<span class="nofilestxt">
+						No comments
+					</span>
+				</div>
 			</div>
 			<div class="Collection" v-show="tabNumber==1">
 				<!-- <Favorites></Favorites> -->
 				<div class="Collection-list">
-					<FileList :FileList='CollectionList'
+					<FileList  v-if='CollectionList.length>0' :FileList='CollectionList'
 						@loginwallet='getlogin'>
 					</FileList>
+					<div class='nofiles' v-else>
+						<img class="nofilesicon" src="@/assets/images/Profile/nofiles.png" alt="">
+						<span class="nofilestxt">
+							No files
+						</span>
+					</div>
 				</div>
 				
 			</div>
@@ -168,7 +209,8 @@
 				fileId: '',
 				address:'',
 				collectionId:0,
-				commentList:[]
+				commentList:[],
+				iscopy: false,
 			}
 		},
 		components: {
@@ -204,6 +246,29 @@
 			
 		},
 		methods: {
+			gotoProfile(){
+				let routeData = this.$router.resolve({
+					path: 'OtherProfile',
+					query: {
+						address: this.fileParams.EthAddr
+					}
+				})
+				window.open(routeData.href, '_blank');
+			},
+			getCopyUrl(){
+				let url =window.location.href
+				
+				var cInput = document.createElement("input");
+				cInput.value = url;
+				document.body.appendChild(cInput);
+				cInput.select();
+				document.execCommand("copy");
+				document.body.removeChild(cInput);
+				this.iscopy = true;
+				setTimeout(() => {
+					this.iscopy = false;
+				}, 3000);
+			},
 			getaddCollectionList(val){
 				let owner = utils.getUser().EthAddr
 				this.intoFileId=this.fileParams.Id
@@ -213,7 +278,7 @@
 					}
 					this.addcollTotal=res.data.Count
 					
-					console.log(res);
+					
 				})
 				
 			},
@@ -227,8 +292,7 @@
 			replyComment(data,val){
 				
 				var arr = Object.keys(data);
-				console.log('data',data);
-				console.log('val',val);
+				
 				if(this.islogin){
 					
 				if(arr.length==0){
@@ -238,7 +302,7 @@
 						"collectionId": Number(this.collectionId),
 						"parentId": 0
 					}).then(res=>{
-						console.log(res);
+						
 						this.commentList.unshift(res.data)
 						this.fileParams.TotalComments++
 					})
@@ -249,7 +313,7 @@
 						"collectionId": Number(this.collectionId),
 						"parentId": data.Id
 					}).then(res=>{
-						console.log(res);
+						
 						let arr=res.data
 						arr.ParentComment={}
 						arr.ParentComment=data
@@ -263,10 +327,9 @@
 				}
 			},
 			deleteFileComments(val,index){
-				console.log(val);
-				console.log(index);
+				
 				deleteCollComment(val.Id).then(res=>{
-					console.log(res);
+					
 					this.commentList.splice(index,1)
 					this.fileParams.TotalComments--
 				})
@@ -293,11 +356,11 @@
 					}else{
 						this.commentList=[]
 					}
-					console.log(res);
+					
 				})
 			},
 			likeComments(val,index){
-				console.log(val);
+				
 				if(this.islogin){
 					if(val.Liked==true){
 						
@@ -307,7 +370,7 @@
 						})
 					}else{
 						CollCommentLike(val.Id).then(res=>{
-							console.log(res);
+							
 							val.Liked=true
 							val.TotalLikes++
 						})
@@ -327,12 +390,12 @@
 					if(boolean){
 						this.fileParams.TotalLikes++
 						likeCollection(this.fileParams.Id).then(res=>{
-							console.log(res);
+							
 						})
 						
 					}else{
 						deleteCollectionLike(this.fileParams.Id).then(res=>{
-							console.log(res);
+							
 						})
 						this.fileParams.TotalLikes--
 					}
@@ -350,7 +413,7 @@
 					this.fileParams.Labels = res.data.Collections[0].Labels.split(',')
 					this.$saoloading.hide();
 					this.getFileList()
-					console.log(res);
+					
 				})
 			},
 			getFileList() {
@@ -362,11 +425,13 @@
 				// }
 				this.fileinfoParams.collectionId=this.fileParams.Id
 				getCollectionFilelist(this.fileinfoParams).then(res => {
-					console.log(res);
+					
 					this.CollectionList.push(...res.data)
 				}).catch()
 			},
-			getlogin(){},
+			getlogin(){
+				this.dialogVisible = true;
+			},
 			login() {
 				this.dialogVisible = true;
 			},
@@ -421,7 +486,85 @@
 		}
 	}
 </script>
+<style>
+	.popoverBackB {
+		height: 144px;
+		padding: 0px !important;
+		box-sizing: border-box;
+		/* overflow: scroll; */
+		background: rgba(10, 51, 32, 0.7) !important;
+		border: 1px solid #68B096 !important;
+	}
 
+	.el-popper[x-placement^="right"] .popper__arrow::after {
+		border-right-color: #000 !important;
+		display: none;
+	}
+
+	.el-popper[x-placement^="right"] .popper__arrow {
+		border-right-color: #44c194 !important;
+		display: none;
+	}
+
+	.el-popper[x-placement^="left"] .popper__arrow::after {
+		border-left-color: #000 !important;
+		display: none;
+	}
+
+	.el-popper[x-placement^="left"] .popper__arrow {
+		border-left-color: #44c194 !important;
+		display: none;
+	}
+
+	.showtigs {
+		display: flex;
+		align-items: center;
+		/* justify-content: space-between; */
+		flex-wrap: wrap;
+	}
+
+	
+	.shareBroad{
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+	.single-share{
+		width: 100%;
+		height: 47px;
+		display: flex;
+		align-items: center;
+		font-size: 14px;
+		color: #68B096;
+		border-bottom: 1px solid rgba(104, 176, 150, 0.15);
+		padding-left: 20px ;
+		box-sizing: border-box;
+		cursor: pointer;
+	}
+	.single-share:nth-child(3){
+		border: none;
+	}
+	.single-share:hover{
+		color: #58FFC3;
+	}
+	.sharelink{
+		width: 16px;
+		height: 16px;
+		margin-right: 8px;
+	}
+	.twitter{
+		width: 17px;
+		height: 14px;
+		margin-right: 8px;
+	}
+	.facebook{
+		width: 16px;
+		height: 16px;
+		margin-right: 8px;
+	}
+	
+</style>
 <style lang="less" scoped>
 	.el-scrollbar {
 		height: 100%;
@@ -434,6 +577,14 @@
 
 	}
 
+a{ text-decoration: none; 
+		color: #68B096;
+		display: flex;
+		align-items: center;
+		transition: 0.5 s;
+	};
+	a:hover {  color : #58FFC3 !important; };
+	a:visited{ text-decoration: none; }
 
 	.el-scrollbar ::v-deep .el-scrollbar__wrap {
 		overflow-y: scroll;
@@ -518,6 +669,7 @@
 						color: #58FFC3;
 						padding: 2px 3px;
 						margin: 0;
+						cursor: pointer;
 					}
 				}
 
@@ -606,7 +758,7 @@
 				line-height: 28px;
 				padding: 0 10px;
 				margin-left: 5px;
-
+				cursor: pointer;
 				.commenticon {
 					width: 18px;
 					height: 16px;
@@ -630,6 +782,7 @@
 				color: #68B096;
 				background: #0A3320;
 				margin-left: 5px;
+				cursor: pointer;
 			}
 
 			.leftshareicon {
@@ -675,6 +828,31 @@
 			width: 100%;
 			height: 100%;
 			background: #070707;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			flex-direction: column;
+			.nofiles {
+				width: 100%;
+				max-width: 1054px;
+				background: rgba(9, 20, 15, 0.5);
+				height: 410px;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+			
+				.nofilesicon {
+					height: 66px;
+					width: 66px;
+				}
+			
+				.nofilestxt {
+					font-size: 14px;
+					color: #243C30;
+					padding-top: 10px
+				}
+			}
 		}
 
 		.Collection {
@@ -687,7 +865,29 @@
 			background: #070707;
 			padding-top: 24px;
 			.Collection-list{
+				width: 100%;
 				max-width: 1072px;
+				.nofiles {
+					width: 100%;
+					max-width: 1054px;
+					background: rgba(9, 20, 15, 0.5);
+					height: 410px;
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					justify-content: center;
+				
+					.nofilesicon {
+						height: 66px;
+						width: 66px;
+					}
+				
+					.nofilestxt {
+						font-size: 14px;
+						color: #243C30;
+						padding-top: 10px
+					}
+				}
 			}
 		}
 	}

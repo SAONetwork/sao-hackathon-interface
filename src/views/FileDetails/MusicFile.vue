@@ -53,7 +53,7 @@
 						<span class="musicname">{{fileParams.Title}}</span>
 					</div>
 					<div class="filemessage">
-						<span class="fileEthAddr infostyle">{{testfile(fileParams.EthAddr)}}</span>
+						<span class="fileEthAddr infostyle" @click="gotoProfile">{{testfile(fileParams.EthAddr)}}</span>
 						<div class="gap"></div>
 						<span class="infostyle"> Uploaded at&nbsp;{{fileParams.CreatedAt}}</span>
 						<div class="gap"></div>
@@ -82,6 +82,10 @@
 						<div v-if="fileParams.EthAddr.toLowerCase() == address">
 							<ActiveBtn @onClickBtn="gotodownload" :btnText="SolidbtnText" :btnstyle="middleSize">
 							</ActiveBtn>
+							<div class="middlebtn"  @click="deletethisFile">
+								<img class="btn-img" src="@/assets/images/Profile/redbtn.png" alt="">
+								<span  class="btn-text">Delete file</span>
+							</div>
 						</div>
 
 						<ActiveBtn @onClickBtn="buyprofile" :btnText="paynowbtnText" :btnstyle="middleSize" v-else>
@@ -100,6 +104,10 @@
 						<ActiveBtn v-if="fileParams.EthAddr.toLowerCase() == address" @onClickBtn="gotodownload"
 							:btnText="SolidbtnText" :btnstyle="middleSize">
 						</ActiveBtn>
+						<div class="middlebtn"  v-if="fileParams.EthAddr.toLowerCase() == address" @click="deletethisFile">
+							<img class="btn-img" src="@/assets/images/Profile/redbtn.png" alt="">
+							<span  class="btn-text">Delete file</span>
+						</div>
 					</div>
 				</div>
 				<div class="nofilebord" v-if="islogin==false">
@@ -115,9 +123,39 @@
 					<div class="boardicon"><img class="commenticon" src="@/assets/images/Common/comment.png" alt="">
 						<span>{{fileParams.TotalComments}}</span>
 					</div>
-					<div class="shareicon"><img class="leftshareicon" src="@/assets/images/Common/share.png" alt="">
-
-					</div>
+					<el-popover
+					  placement="right-start"
+					  width="210"
+					  trigger="hover"
+					   popper-class="popoverBackB"
+					  >
+						<div class="shareBroad">
+							<div class="single-share">
+								<a
+								        href="javascript:window.open('http://twitter.com/home?status='+encodeURIComponent(document.location.href)+' '+encodeURIComponent(document.title),'_blank','toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=600, height=450,top=100,left=350');void(0)">
+								       <img class="twitter" src="@/assets/images/Market/twitter.png" alt=""> Share to Twitter </a>
+								
+							</div>
+							<div class="single-share">
+								
+								 <a
+								        href="javascript:window.open('http://www.facebook.com/sharer.php?u='+encodeURIComponent(document.location.href),'_blank','toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=600, height=450,top=100,left=350');void(0)">
+								        <img  class="facebook"  src="@/assets/images/Market/facebook.png" alt="">
+										Share to Facebook
+								
+								</a>
+							</div>
+							<div class="single-share" @click="getCopyUrl">
+								<img  class="sharelink" src="@/assets/images/Market/sharelink.png" alt="">
+								<span v-show="!iscopy">Copy link</span>
+								
+								<span v-show="iscopy">Copied</span>
+							</div>
+						</div>
+					  <div slot="reference" class="shareicon"><img class="leftshareicon" src="@/assets/images/Common/share.png" alt="">
+					  </div>
+					  
+					</el-popover>
 				</div>
 			</div>
 			<div class="changetab">
@@ -133,12 +171,24 @@
 			<div class="Comments" v-show="tabNumber==1">
 				
 				<Comment :commentList='commentList' @replyComment='replyComment' @deleteComment='deleteFileComments' @likeComment='likeComments'></Comment>
+				<div class='nofiles' v-if="commentList.length==0">
+					<img class="nofilesicon" src="@/assets/images/Profile/nofiles.png" alt="">
+					<span class="nofilestxt">
+						No comments
+					</span>
+				</div>
 			</div>
 			<div class="Collection" v-show="tabNumber==2">
-				<Favorites :favolist='collections'></Favorites>
-				<div v-show="cancelloading" class="loading-box">
-					<img class="loadinggif" src="@/assets/images/Common/saoloading.gif" alt="">
+				<Favorites :favolist='collections' v-if="collections.length>0"></Favorites>
+				<div class='nofiles' v-else>
+					<img class="nofilesicon" src="@/assets/images/Profile/nofiles.png" alt="">
+					<span class="nofilestxt">
+						No collections
+					</span>
 				</div>
+				<!-- <div v-show="cancelloading" class="loading-box">
+					<img class="loadinggif" src="@/assets/images/Common/saoloading.gif" alt="">
+				</div> -->
 			</div>
 		</div>
 		<DiaLog :visible.sync="dialogVisible" :title="DiaLogtitle">
@@ -149,6 +199,7 @@
 			:title="BuyDiaLogtitle" :profileInfo='buyinginfo'></BuyDiaLog>
 		<SuccessDiaLog :visible.sync="successVisible" :title="BuySuccesstitle" :successBuyinginfo='successBuyinginfo'>
 		</SuccessDiaLog>
+		<DeleteDialog :visible.sync='showDelete' :title="deleteTitle" @confirmDelete='confirmDelete'></DeleteDialog>
 		<FallDiaLog :visible.sync="fallVisible" :fallBuyinginfo='fallBuyinginfo' @successbuy='successbuy'></FallDiaLog>
 	</el-scrollbar>
 </template>
@@ -156,7 +207,7 @@
 <script>
 	import {
 		fileDetails,
-		download,getCollectionList,getComment,addFileComment,deleteFileComment,CommentLike,UnlikeComment
+		download,getCollectionList,getComment,addFileComment,deleteFileComment,CommentLike,UnlikeComment,deleteFile
 	} from '../../api/FileApi.js'
 	import utils from '../../libs/utils.js'
 	import ActiveBtn from '../../components/ActiveBtn.vue'
@@ -215,6 +266,9 @@
 					owner:''
 				},
 				addcollTotal:0,
+				deleteTitle:'Delete file',
+				showDelete:false,
+				iscopy: false,
 			}
 		},
 		watch:{
@@ -261,7 +315,6 @@
 			this.$saoloading.show('Loading', 'ball');
 			this.fileId = this.$route.query.id
 			this.collectionParams.fileId= this.$route.query.id
-			this.addCollParams.owner=utils.getUser().EthAddr
 			this.addCollParams.fileId= this.$route.query.id
 			this.getfiledetails()
 			this.getMusicUrl()
@@ -271,7 +324,6 @@
 				network,
 				connected
 			}) => {
-
 				if (connected) {
 					this.$getWalletAddress().then(address => {
 						this.address = address;
@@ -282,8 +334,39 @@
 		},
 		
 		methods: {
+			gotoProfile(){
+				let routeData = this.$router.resolve({
+					path: 'OtherProfile',
+					query: {
+						address: this.fileParams.EthAddr
+					}
+				})
+				window.open(routeData.href, '_blank');
+			},
+			getCopyUrl(){
+				let url =window.location.href
+				
+				var cInput = document.createElement("input");
+				cInput.value = url;
+				document.body.appendChild(cInput);
+				cInput.select();
+				document.execCommand("copy");
+				document.body.removeChild(cInput);
+				this.iscopy = true;
+				setTimeout(() => {
+					this.iscopy = false;
+				}, 3000);
+			},
+			deletethisFile(){
+				this.showDelete=true
+			},
+			confirmDelete(){
+				deleteFile(this.fileId).then(res=>{
+					
+					this.$router.push('/Space',)
+				})
+			},
 			loadMoreColl(){
-				console.log('more');
 				if (this.addcollTotal > this.intoCollectionList.length) {
 					
 					this.addCollParams.offset = this.addCollParams.offset + this.addCollParams.limit
@@ -311,16 +394,15 @@
 			
 			},
 			getaddCollectionList(val){
-				let owner = utils.getUser().EthAddr
+			
+				this.addCollParams.owner=utils.getUser().EthAddr
 				this.intoFileId=this.fileParams.Id
 				getCollectionList(this.addCollParams).then(res=>{
 					if(res.data.Count>0){
 						this.intoCollectionList.push(...res.data.Collections)
 					}
 					this.addcollTotal=res.data.Count
-					// this.addcollTotal=7
-					// this.intoCollectionList.push(...res.data.Collections)
-					console.log(res);
+					
 				})
 				
 			},
@@ -332,8 +414,7 @@
 				
 			},
 			replyComment(data,val){
-				console.log('data',data);
-				console.log('val',val);
+				
 				var arr = Object.keys(data);
 			
 				if(this.islogin){
@@ -344,7 +425,6 @@
 							"fileId": this.fileParams.Id,
 							"parentId": 0
 						}).then(res=>{
-							console.log(res);
 							this.commentList.unshift(res.data)
 							this.fileParams.TotalComments++
 						})
@@ -355,7 +435,6 @@
 							"fileId": this.fileParams.Id,
 							"parentId": data.Id
 						}).then(res=>{
-							console.log(res);
 							let arr=res.data
 							arr.ParentComment={}
 							arr.ParentComment=data
@@ -370,10 +449,9 @@
 				
 			},
 			deleteFileComments(val,index){
-				console.log(val);
-				console.log(index);
+			
 				deleteFileComment(val.Id).then(res=>{
-					console.log(res);
+				
 					this.commentList.splice(index,1)
 					this.fileParams.TotalComments--
 				})
@@ -381,9 +459,9 @@
 			getCollectionLists(){
 				getCollectionList(this.collectionParams).then(res=>{
 					this.cancelloading=false
+					this.fileParams.TotalCollections=res.data.Count
 					if(res.data.Count>0){
 						this.collections.push(...res.data.Collections)
-						this.fileParams.TotalCollections=res.data.Count
 					}
 					
 					
@@ -399,11 +477,11 @@
 					}else{
 						this.commentList=[]
 					}
-					console.log(res);
+					
 				})
 			},
 			likeComments(val,index){
-				console.log(val);
+				
 				if(this.islogin){
 					if(val.Liked==true){
 						
@@ -413,7 +491,7 @@
 						})
 					}else{
 						CommentLike(val.Id).then(res=>{
-							console.log(res);
+							
 							val.Liked=true
 							val.TotalLikes++
 						})
@@ -462,7 +540,7 @@
 				})
 			},
 			canplaysong() {
-				console.log(this.$refs.audio.duration)
+				
 				let total = parseInt(this.$refs.audio.duration)
 				this.musictotaltimemode = total
 				let minute = total % 60
@@ -534,7 +612,85 @@
 		}
 	}
 </script>
+<style>
+	.popoverBackB {
+		height: 144px;
+		padding: 0px !important;
+		box-sizing: border-box;
+		/* overflow: scroll; */
+		background: rgba(10, 51, 32, 0.7) !important;
+		border: 1px solid #68B096 !important;
+	}
 
+	.el-popper[x-placement^="right"] .popper__arrow::after {
+		border-right-color: #000 !important;
+		display: none;
+	}
+
+	.el-popper[x-placement^="right"] .popper__arrow {
+		border-right-color: #44c194 !important;
+		display: none;
+	}
+
+	.el-popper[x-placement^="left"] .popper__arrow::after {
+		border-left-color: #000 !important;
+		display: none;
+	}
+
+	.el-popper[x-placement^="left"] .popper__arrow {
+		border-left-color: #44c194 !important;
+		display: none;
+	}
+
+	.showtigs {
+		display: flex;
+		align-items: center;
+		/* justify-content: space-between; */
+		flex-wrap: wrap;
+	}
+
+	
+	.shareBroad{
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+	.single-share{
+		width: 100%;
+		height: 47px;
+		display: flex;
+		align-items: center;
+		font-size: 14px;
+		color: #68B096;
+		border-bottom: 1px solid rgba(104, 176, 150, 0.15);
+		padding-left: 20px ;
+		box-sizing: border-box;
+		cursor: pointer;
+	}
+	.single-share:nth-child(3){
+		border: none;
+	}
+	.single-share:hover{
+		color: #58FFC3;
+	}
+	.sharelink{
+		width: 16px;
+		height: 16px;
+		margin-right: 8px;
+	}
+	.twitter{
+		width: 17px;
+		height: 14px;
+		margin-right: 8px;
+	}
+	.facebook{
+		width: 16px;
+		height: 16px;
+		margin-right: 8px;
+	}
+	
+</style>
 <style lang="less" scoped>
 	.el-scrollbar {
 		height: 100%;
@@ -546,6 +702,14 @@
 		}
 
 	}
+a{ text-decoration: none; 
+		color: #68B096;
+		display: flex;
+		align-items: center;
+		transition: 0.5 s;
+	};
+	a:hover {  color : #58FFC3 !important; };
+	a:visited{ text-decoration: none; }
 
 
 	.el-scrollbar ::v-deep .el-scrollbar__wrap {
@@ -678,6 +842,7 @@
 						color: #58FFC3;
 						padding: 2px 3px;
 						margin: 0;
+						cursor: pointer;
 					}
 				}
 			}
@@ -741,7 +906,37 @@
 				align-items: center;
 				justify-content: flex-start;
 			}
-
+.middlebtn {
+					box-sizing: border-box;
+					position: relative;
+					font-size: 12px;
+					cursor: pointer;
+					width: 146px;
+					height: 40px;
+					margin-left: 32px;
+					.btn-img {
+						position: absolute;
+						width: 100%;
+						height: 100%;
+						left: 0;
+						top: 0;
+						z-index: 1
+					}
+				
+					.btn-text {
+						z-index: 2;
+						position: absolute;
+						left: 50%;
+						top: 50%;
+						font-size: 14px;
+						font-weight: bold;
+						transform: translate(-50%, -50%);
+						width: 100%;
+						text-align: center;
+						color: #FF5858;
+						user-select: none
+					}
+				}
 			.price {
 				// width: 50%;
 				font-weight: 700;
@@ -790,6 +985,7 @@
 				color: #68B096;
 				background: #0A3320;
 				margin-left: 5px;
+				cursor: pointer;
 			}
 
 			.leftshareicon {
@@ -835,6 +1031,31 @@
 			width: 100%;
 			height: 100%;
 			background: #070707;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			.nofiles {
+				width: 100%;
+				max-width: 1054px;
+				background: rgba(9, 20, 15, 0.5);
+				height: 410px;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+			
+				.nofilesicon {
+					height: 66px;
+					width: 66px;
+				}
+			
+				.nofilestxt {
+					font-size: 14px;
+					color: #243C30;
+					padding-top: 10px
+				}
+			}
 		}
 
 		.Collection {
@@ -846,6 +1067,27 @@
 			// min-height: 500px;
 			background: #070707;
 			padding-top: 24px;
+			.nofiles {
+				width: 100%;
+				max-width: 1054px;
+				background: rgba(9, 20, 15, 0.5);
+				height: 410px;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+			
+				.nofilesicon {
+					height: 66px;
+					width: 66px;
+				}
+			
+				.nofilestxt {
+					font-size: 14px;
+					color: #243C30;
+					padding-top: 10px
+				}
+			}
 			.loading-box{
 				width: 100%;
 				height: 60px;

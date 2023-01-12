@@ -1,5 +1,6 @@
 <template>
 	<el-scrollbar>
+		
 		<div class="upload">
 			<div class="uploadmain">
 				<!-- uploadfile -->
@@ -79,15 +80,16 @@
 									class="avatar-uploader" :action="uploadApi" :show-file-list="false"
 									:on-success="handleAvatarSuccess" :accept="accept"
 									:before-upload="beforeAvatarUpload">
+									
 									<img class="preview-cover" v-if="uploadForm.preview"
-										:src="'data:image/png;base64,'+ uploadForm.preview">
+										:src="uploadForm.preview">
 									<div class="avatar-uploader-bg" v-else>
 										<img class="addicon" src="@/assets/images/Upload/add.png" alt="">
 									</div>
 								</el-upload>
 								<div class="covers-tig">
 									<div class="covers-warn">
-										<span>Support JPG, JPEG, PNG</span>
+										<span>Support JPG, JPEG, PNG, GIF</span>
 										<span>Max size: 6 MB</span>
 									</div>
 									<MiniHollowBtn @MHoBtn='randomCover' :btnstyle='Randombtnstyle'>
@@ -249,7 +251,7 @@
 				showUploadBtn: false,
 				doubleUploadbtn: false,
 				fileList: [],
-				accept: ".jpg,.png,.jpeg",
+				accept: ".jpg,.png,.jpeg,.gif",
 				DiaLogtitle: 'Connect wallet',
 				ChangeRinkebyVisible: false,
 				rules: {
@@ -287,7 +289,7 @@
 		watch: {
 			uploadForm: {
 				handler(newValue, oldValue) {
-					// console.log(newValue);
+					
 
 					if (
 						newValue.preview.length > 0 &&
@@ -304,7 +306,7 @@
 		},
 		methods: {
 			inputPrice() {
-				console.log(this.uploadForm.Price)
+				
 				this.uploadForm.Price = this.uploadForm.Price.replace(/[^\d.]/g, "");
 				this.uploadForm.Price = this.uploadForm.Price.replace(/\.{2,}/g, ".");
 				this.uploadForm.Price = this.uploadForm.Price
@@ -326,7 +328,7 @@
 
 			},
 			uploaderror(file) {
-				console.log(file)
+				
 			},
 			uploadloading() {},
 			focusOn() {
@@ -353,7 +355,7 @@
 				this.showpriceborder = true;
 			},
 			selectfile() {
-				console.log("selectfile");
+				
 			},
 			Cancelprofile() {
 				this.$refs.upload.abort();
@@ -363,11 +365,11 @@
 				this.$refs.upload.clearFiles();
 			},
 			Deleteprofile() {
-				console.log(11111);
+				
 				this.doubleUploadbtn = false;
 				cancelUpload(this.uploadForm.fileId)
 					.then(res => {
-						console.log(res);
+						
 						this.showUpload = true;
 						this.$refs.upload.clearFiles();
 						this.loadProgress = 0;
@@ -456,7 +458,7 @@
 					this.uploadForm.Price * 1,
 					address,
 					res => {
-						console.log(res);
+						
 						if (res === 3) {
 							this.$saoloading.hide();
 							this.$router.push("/Profile");
@@ -469,7 +471,7 @@
 				);
 			},
 			uploadSuccess(res, file) {
-				console.log(res);
+				
 				if (res.code == 200) {
 					this.uploadForm.fileId = res.data.Id;
 					if (res.data.Preview != '') {
@@ -485,7 +487,7 @@
 			},
 			onProgress(event) {
 				this.loadProgress = parseInt(event.percent);
-				console.log(this.loadProgress);
+				
 				if (this.loadProgress >= 100) {
 					this.loadProgress = 100;
 				}
@@ -496,14 +498,14 @@
 				let imgs = require(`../../assets/avatar/${random}.png`);
 
 				utils.getImgBase64(imgs).then(res => {
+					
 					this.uploadForm.preview = res;
 					this.israndom = false;
-					console.log(res);
+					
 				});
 			},
 			deleteTag(v, i) {
-				console.log(v);
-				console.log(i);
+				
 				this.uploadForm.tags.splice(i, 1);
 			},
 
@@ -516,7 +518,7 @@
 				// }
 			},
 			beforeUpload(file) {
-				console.log(file)
+				
 				var url = URL.createObjectURL(file);
 				var audioElement = new Audio(url);
 				var duration;
@@ -534,13 +536,12 @@
 				return isLt50M;
 			},
 			handleAvatarSuccess(res, file) {
-				console.log(res);
-				console.log(file);
+				
 
 				// this.uploadForm.preview = URL.createObjectURL(file.raw);
 			},
 			beforeAvatarUpload(file, files) {
-				let rules = ["image/jpeg", "image/jpg", "image/svg", "image/png"];
+				let rules = ["image/jpeg", "image/jpg", "image/svg", "image/png","image/gif"];
 				const isJPG = rules.some(item => {
 					return file.type == item;
 				});
@@ -550,9 +551,10 @@
 					this.$message.error("MAX 6MB!");
 				}
 				if (isLt6M && isJPG) {
-					utils.getFileBase64(file).then(base64 => {
+					
+					utils.getFileAvatarBase64(file).then(base64 => {
 						this.uploadForm.preview = base64;
-						console.log(this.uploadForm.preview)
+						
 					});
 				}
 				return isJPG && isLt6M;
@@ -567,11 +569,11 @@
 					let booleans = this.uploadForm.tags.find(item => {
 						return item.toLowerCase() == this.inputTags.toLowerCase()
 					})
-					console.log(booleans)
+					
 					if (!booleans) {
 						this.uploadForm.tags.push(this.inputTags);
 					}
-					console.log(this.uploadForm.tags)
+					
 				}
 				this.inputTags = "";
 			},
@@ -583,11 +585,11 @@
 					let booleans = this.uploadForm.tags.find(item => {
 						return item.toLowerCase() == v.toLowerCase()
 					})
-					console.log(booleans)
+					
 					if (!booleans) {
 						this.uploadForm.tags.push(v);
 					}
-					console.log(this.uploadForm.tags)
+					
 				}
 			},
 			putfileTags() {
@@ -957,7 +959,7 @@
 					width: 100px;
 					height: 100px;
 					border: 1px solid #57b196;
-					object-fit: cover
+					object-fit: cover;
 				}
 			}
 

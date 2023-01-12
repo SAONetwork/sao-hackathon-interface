@@ -1,5 +1,5 @@
 <template>
-	<el-scrollbar>
+	<el-scrollbar ref="scrollbar">
 		<div class="profile">
 			<div class="profile-userinfo">
 				<div class="userinfos">
@@ -26,8 +26,16 @@
 										</span><span>Files</span>
 									</div>
 									<div class="finenumber">
-										<span class="finenumberdetails">{{userSummary.Collections}}
+										<span class="finenumberdetails">{{userinfo.TotalCollections}}
 										</span><span>Collections</span>
+									</div>
+									<div class="finenumber followhands" @click="checkfollw(0)">
+										<span class="finenumberdetails">{{userinfo.TotalFollowings}}
+										</span><span>Following</span>
+									</div>
+									<div class="finenumber followhands"  @click="checkfollw(1)">
+										<span class="finenumberdetails">{{userinfo.TotalFollowers}}
+										</span><span>Follower</span>
 									</div>
 								</div>
 							</div>
@@ -93,45 +101,7 @@
 
 				<div class="tabNumber1" v-if="tabNumber==1">
 					<div class="tabNumberHome">
-						<!-- <div class="homehead">
-							<div>
-								<img class="homeheadicon" src="@/assets/images/Profile/data.png" alt="">
-								<span>Data</span>
-							</div>
 						
-						</div>
-						<div class="user-information">
-							<div class="user-infodetails">
-								<span class="infostitle">Storage Space </span>
-								<span class="infosmain" v-if='userSummary.SpaceUsed>=0'>
-									{{userSummary.SpaceUsed}}G/{{userSummary.SpaceQuota}}G </span>
-								<span class="infosmain" v-else>-</span>
-							</div>
-							<div class="user-infodetails">
-								<span class="infostitle">Applications </span>
-								<span class="infosmain"
-									v-if='userSummary.Applications>=0'>{{userSummary.Applications}}</span>
-								<span class="infosmain" v-else>-</span>
-							</div>
-							<div class="user-infodetails">
-								<span class="infostitle">Total Uploads (Public)</span>
-								<span class="infosmain"
-									v-if='userSummary.TotalUploads>=0'>{{userSummary.TotalUploads}}</span>
-								<span class="infosmain" v-else>-</span>
-							</div>
-							<div class="user-infodetails">
-								<span class="infostitle">Total Purchases </span>
-								<span class="infosmain"
-									v-if='userSummary.PurchasesFiles>=0'>{{userSummary.PurchasesFiles}}</span>
-								<span class="infosmain" v-else>-</span>
-							</div>
-							<div class="user-infodetails">
-								<span class="infostitle">Collections </span>
-								<span class="infosmain"
-									v-if='userSummary.Collections>=0'>{{userSummary.Collections}}</span>
-								<span class="infosmain" v-else>-</span>
-							</div>
-						</div> -->
 						<div class="homehead">
 							<div>
 								<img class="homeheadicon" src="@/assets/images/Profile/data.png" alt="">
@@ -316,6 +286,7 @@
 			<transition name="dialog-fade">
 				<EditUser v-if="eiditVisible" :visible.sync="eiditVisible" :userinfo='userinfo'></EditUser>
 			</transition>
+			<Followings :title='followtitle' :followList='followList' :visible.sync="FollowVisible"></Followings>
 			<AddCollection  :visible.sync="AddCollectionVisible" @getlistagain='getcollAgain'></AddCollection>
 		</div>
 	</el-scrollbar>
@@ -327,7 +298,9 @@
 		update,
 		getUserDashboard,
 		getUserSummary,
-		getUserPurchases
+		getUserPurchases,
+		getUserFollower,
+		getUserFollowing
 	} from "../../api/UserApi.js";
 	import {
 		fileInfos,
@@ -349,6 +322,7 @@
 	import FileList from "@/components/FileList.vue";
 	import EditUser from '@/components/EditUser.vue'
 	import AddCollection from '@/components/AddCollection.vue'
+	import Followings from '@/components/Followings.vue'
 	export default {
 
 		data() {
@@ -393,11 +367,22 @@
 				collections:[],
 				isMine:true,
 				likeCollParams:{
-					address:'',
+					// address:'',
 					offset:0,
 					limit:10
 				},
-				likeCollections:[]
+				collectionParams:{
+					offset:0,
+					limit:10,
+					owner:''
+				},
+				likeCollections:[],
+				cancelloading:false,
+				TotalCollections:0,
+				TotalLiked:0,
+				FollowVisible:false,
+				followList:[],
+				followtitle:''
 			};
 		},
 		mounted() {
@@ -445,6 +430,26 @@
 					location.href = "https://harmonious-treacle-9cadd3.netlify.app";
 				}
 			})
+			this.$refs.scrollbar.handleScroll=()=>{
+			
+			        var wrap = this.$refs.scrollbar.wrap;
+			
+			        this.$refs.scrollbar.moveY = wrap.scrollTop * 100 / wrap.clientHeight;
+			
+			        this.$refs.scrollbar.moveX = wrap.scrollLeft * 100 / wrap.clientWidth;
+			
+			        let poor = wrap.scrollHeight - wrap.clientHeight
+			
+			        if( poor == parseInt(wrap.scrollTop) || poor == Math.ceil(wrap.scrollTop) || poor == Math.floor(wrap.scrollTop) ){
+			
+						if(this.tabNumber==2){
+			//             this.cancelloading?'':this.loadMores()
+							this.loadMores()
+						}
+			
+			        }
+			
+			    }
 		},
 		components: {
 			MiniHollowBtn,
@@ -453,13 +458,61 @@
 			FileList,
 			EditUser,
 			AddCollection,
-			Favorites
+			Favorites,
+			Followings
 		},
 		
 		methods: {
+			checkfollw(val){
+				
+				this.FollowVisible=true
+					this.followList=[]
+				if(val==1){
+					this.followtitle='Follower'
+					getUserFollower({
+						address:this.userinfo.EthAddr
+					}).then(res=>{
+						
+						if(res.data){
+						this.followList=res.data
+						}else{
+							this.followList=[]
+						}
+					})
+				}else{
+					this.followtitle='Following'
+					getUserFollowing({
+						address:this.userinfo.EthAddr
+					}).then(res=>{
+						if(res.data){
+						this.followList=res.data
+						}else{
+							this.followList=[]
+						}
+					})
+				}
+			},
+			loadMores(){
+				
+				if (this.TotalCollections > this.collections.length) {
+					// this.cancelloading = true
+					this.collectionParams.offset = this.collectionParams.offset + this.collectionParams.limit
+					this.getCollectionLists()
+				} else {
+					// this.cancelloading = false
+				}
+				if (this.TotalLiked > this.likeCollections.length) {
+					// this.cancelloading = true
+					this.likeCollParams.offset = this.likeCollParams.offset + this.likeCollParams.limit
+					this.getLikedCollections()
+				} else {
+					// this.cancelloading = false
+				}
+			},
 			getLikedCollections(){
 				getLikedCollection(this.likeCollParams).then(res=>{
-					console.log(res);
+					
+					this.TotalLiked=res.data.Count
 					if(res.data.Count>0){
 					this.likeCollections.push(...res.data.Collections)
 					}
@@ -469,17 +522,21 @@
 				this.collections=this.collections.filter(item=>{
 					return item.Id !== val.Id
 				})
-				// deleteCollection({
-				// 	collectionId:val.Id
-				// }).then(res=>{
-				// 	console.log(res);
-				// })
+				
 				deleteCollection(val.Id).then(res=>{
-					console.log(res);
+					
+					this.getUserDashboard()
+					this.getUserPurchases()
+					this.userinfo.TotalCollections--
+					this.likeCollections=[]
+					this.likeCollParams.offset=0
+					this.getLikedCollections()
+					
 				})
+				
 			},
 			CreateCollection() {
-				console.log(111);
+				
 				this.AddCollectionVisible = true
 			},
 			claimnow() {
@@ -497,7 +554,7 @@
 			},
 			claim(address) {
 				this.$contractClaim(address, res => {
-					console.log(res);
+					
 					if (res === 4) {
 						this.$emit('successbuy', this.profileInfo);
 					}
@@ -514,14 +571,15 @@
 			getSummary() {
 				getUserSummary()
 					.then(res => {
+						
 						this.userSummary = res.data
 					})
 					.catch(response => {
-						console.log(response);
+						
 					})
 			},
 			edituserinfo() {
-				console.log(this.userinfo)
+				
 				this.eiditVisible = true
 			},
 
@@ -529,23 +587,24 @@
 			getUserInfo(address) {
 				getUserProfile()
 					.then(res => {
-						console.log(res);
+						
 						this.userinfo = res.data
 						this.$contractBalances(this.$address).then(result => {
 							this.userinfo.balance = Web3.utils.fromWei(result + "", 'ether')
-							console.log("userifo", this.userinfo)
+							
 						})
-						this.likeCollParams.address=res.data.EthAddr
+						this.collectionParams.owner=res.data.EthAddr
+						// this.likeCollParams.address=res.data.EthAddr
 					})
 					.catch(response => {
-						console.log(response);
+						
 					});
 
 			},
 			getUserDashboard() {
 				getUserDashboard()
 					.then(res => {
-						console.log(res);
+						
 						if (res.data.RecentUploads != null) {
 							let list = res.data.RecentUploads;
 							this.allFileMarketList = list
@@ -588,12 +647,18 @@
 			getlogin() {},
 			manageUser() {},
 			getcollAgain(){
+				this.collectionParams.offset=0
 				this.collections=[]
+				this.likeCollections=[]
+				this.likeCollParams.offset=0
 				this.getCollectionLists()
+				this.getLikedCollections()
 			},
 			getCollectionLists(){
-				getCollectionList({owner:this.userinfo.EthAddr}).then(res=>{
-					console.log(res.data.Count);
+				getCollectionList(this.collectionParams).then(res=>{
+					
+					this.TotalCollections=res.data.Count
+					this.userinfo.TotalCollections=res.data.Count
 					if(res.data.Count>0){
 						
 					this.collections.push(...res.data.Collections)
@@ -607,6 +672,7 @@
 					this.collections=[]
 					this.likeCollections=[]
 					this.likeCollParams.offset=0
+					this.collectionParams.offset=0
 					this.getCollectionLists()
 					this.getLikedCollections()
 				}
@@ -858,15 +924,19 @@
 
 						.finenumber {
 							padding-right: 20px;
+							border-left: 1px solid #57b196;
+							padding-left: 20px;
 						}
-
+						.followhands{
+							cursor: pointer;
+						}
 						.finenumberdetails {
 							color: #58FFC3
 						}
 
-						.finenumber:nth-child(2) {
-							border-left: 1px solid #57b196;
-							padding-left: 20px;
+						.finenumber:nth-child(1) {
+							border-left: none;
+							padding-left: 0px;
 						}
 					}
 				}

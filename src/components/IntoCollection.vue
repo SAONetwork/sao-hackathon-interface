@@ -19,8 +19,8 @@
 							<el-scrollbar>
 								
 								<ul  v-infinite-scroll="load">
-									<li  :class="item.FileIncluded==true?'ischeckedList collectionlist':'collectionlist'" v-for="(item,index) in checkList" :key="index" @click="changeCheck(item,index)">
-										<!-- <el-checkbox :checked='chekced' :v-model="item.ischeck" @change="changeCheck(item,index)"></el-checkbox> -->
+									<li  :class="item.FileIncluded?'ischeckedList collectionlist':'collectionlist'" v-for="(item,index) in checkList" :key="index" @click="changeCheck(item,index)">
+										
 										<div class="nocheck" v-show="!item.FileIncluded">
 											<img src="../assets/images/Market/notcol.png" alt="">
 										</div>
@@ -28,7 +28,7 @@
 											<img src="../assets/images/Market/iscol.png" alt="">
 										</div>
 										<div class="coll-info">
-											<img :class="item.FileIncluded==true?'ischeckecoll-preview coll-preview':'coll-preview'" :src="item.Preview" alt="">
+											<img :class="item.FileIncluded?'ischeckecoll-preview coll-preview':'coll-preview'" :src="item.Preview" alt="">
 											<img v-if="item.Type==1" class="favopriicon" src="@/assets/images/Common/collprivacy.png" alt="">
 											<span>{{item.Title | ellipsis}}</span>
 										</div>
@@ -85,10 +85,13 @@ import ActiveBtn from "./ActiveBtn";
 		components:{
 			ActiveBtn,BorderBtn,AddCollection
 		},
+		  
 		  filters: {
+		    
 		    ellipsis(value) {
 		      if (!value) return "";
 		      if (value.length > 30) {
+		        
 		        return (
 		          value
 		            .replace(/&nbsp;/g, "")
@@ -120,7 +123,7 @@ import ActiveBtn from "./ActiveBtn";
 				this.AddCollectionVisible=true
 			},
 			changeCheck(item,index){
-				console.log(item);
+				
 				item.FileIncluded = !item.FileIncluded
 			},
 			confirmInto(){
@@ -135,7 +138,7 @@ import ActiveBtn from "./ActiveBtn";
 					collectionIds:checkArr,
 					fileId:this.fileId
 				}).then(res=>{
-					console.log(res);
+					
 					this.$emit('aleadyStar',res.data)
 					this.cancleDialog()
 				})
@@ -198,7 +201,7 @@ import ActiveBtn from "./ActiveBtn";
 			height: 580px;
 			position: absolute;
 			left: 50%;
-			top: 40%;
+			top: 50%;
 			box-sizing: border-box;
 			padding: 35px 40px;
 			transform: translate(-50%, -50%);

@@ -1,5 +1,5 @@
 <template>
-	<el-scrollbar>
+	<el-scrollbar ref="scrollbar">
 		<div class="profile">
 			<div class="profile-userinfo">
 				<div class="userinfos">
@@ -166,6 +166,24 @@
 							</span>
 						</div>
 					</div>
+					<div class="Collectionhead" style="margin: 13px 0;">
+						<div class="Collectionhead-left">
+							
+							<span>Liked</span>
+						</div>
+						
+					</div>
+					<div class="homeFileList">
+					
+						
+						<Favorites v-if="likeCollections.length>0" :favolist='likeCollections'  @confirmDeleteColl='confirmDeleteColl' @updatecoll='getcollAgain'></Favorites>
+						<div class='nofiles' v-else>
+							<img class="nofilesicon" src="@/assets/images/Profile/nofiles.png" alt="">
+							<span class="nofilestxt">
+								No collections
+							</span>
+						</div>
+					</div>
 				</div>
 
 				<div class="tabNumber1" v-if="tabNumber==3">
@@ -199,7 +217,9 @@
 
 
 			</div>
+			<DiaLog :visible.sync="dialogVisible" :title="DiaLogtitle">
 			
+			</DiaLog>
 			<AddCollection  :visible.sync="AddCollectionVisible"></AddCollection>
 			
 			<Followings :title='followtitle' :followList='followList' :visible.sync="FollowVisible"></Followings>
@@ -222,7 +242,8 @@
 		download,
 		cancelUpload,
 		addFileWithPreview,
-		getCollectionList
+		getCollectionList,
+		getLikedCollection
 	} from "../../api/FileApi.js";
 
 	import config from "../../libs/config.js";
@@ -236,6 +257,7 @@
 	import EditUser from '@/components/EditUser.vue'
 	import AddCollection from '@/components/AddCollection.vue'
 	import Followings from '@/components/Followings.vue'
+	import DiaLog from "@/components/DiaLog.vue";
 	export default {
 
 		data() {
@@ -279,7 +301,24 @@
 				FollowVisible:false,
 				followtitle:'Follower',
 				followList:[],
-				collections:[]
+				collections:[],
+				likeCollParams:{
+					address:'',
+					offset:0,
+					limit:10
+				},
+				likeCollections:[],
+				cancelloading:false,
+				TotalCollections:0,
+				TotalLiked:0,
+				collectionParams:{
+					offset:0,
+					limit:10,
+					owner:''
+				},
+				islogin:false,
+				dialogVisible:false,
+				DiaLogtitle:'Connect wallet'
 			};
 		},
 		created(){
@@ -287,9 +326,41 @@
 			this.getOtherProfile(profileaddress)
 			this.getUserDashboards(profileaddress)
 			this.getUserPurchases(profileaddress)
+			this.$checkConnectedAndNetwork().then(({
+				network,
+				connected
+			}) => {
+				
+				if (connected) {
+					this.$getWalletAddress().then(address => {
+						
+						this.islogin = address ? true : false;
+					});
+				}
+			})
 		},
 		mounted() {
+		
+			this.$refs.scrollbar.handleScroll=()=>{
 			
+			        var wrap = this.$refs.scrollbar.wrap;
+			
+			        this.$refs.scrollbar.moveY = wrap.scrollTop * 100 / wrap.clientHeight;
+			
+			        this.$refs.scrollbar.moveX = wrap.scrollLeft * 100 / wrap.clientWidth;
+			
+			        let poor = wrap.scrollHeight - wrap.clientHeight
+			
+			        if( poor == parseInt(wrap.scrollTop) || poor == Math.ceil(wrap.scrollTop) || poor == Math.floor(wrap.scrollTop) ){
+			
+						if(this.tabNumber==2){
+			//             this.cancelloading?'':this.loadMores()
+							this.loadMores()
+						}
+			
+			        }
+			
+			    }
 		},
 		components: {
 			MiniHollowBtn,
@@ -299,12 +370,40 @@
 			EditUser,
 			AddCollection,
 			Favorites,
-			Followings
+			Followings,
+			DiaLog
 		},
 		
 		methods: {
+			
+				loadMores(){
+					
+					if (this.TotalCollections > this.collections.length) {
+						// this.cancelloading = true
+						this.collectionParams.offset = this.collectionParams.offset + this.collectionParams.limit
+						this.getCollectionLists()
+					} else {
+						// this.cancelloading = false
+					}
+					if (this.TotalLiked > this.likeCollections.length) {
+						// this.cancelloading = true
+						this.likeCollParams.offset = this.likeCollParams.offset + this.likeCollParams.limit
+						this.getLikedCollections()
+					} else {
+						// this.cancelloading = false
+					}
+				},
+			getLikedCollections(){
+				getLikedCollection(this.likeCollParams).then(res=>{
+					
+					this.TotalLiked=res.data.Count
+					if(res.data.Count>0){
+					this.likeCollections.push(...res.data.Collections)
+					}
+				})
+			},
 			checkfollw(val){
-				console.log(val);
+				
 				this.FollowVisible=true
 					this.followList=[]
 				if(val==1){
@@ -312,7 +411,7 @@
 					getUserFollower({
 						address:this.userinfo.EthAddr
 					}).then(res=>{
-						console.log(res);
+						
 						if(res.data){
 						this.followList=res.data
 						}else{
@@ -336,50 +435,42 @@
 				getOtherUserinfo({
 					address:address
 				}).then(res=>{
-					console.log(res);
+
 					this.userinfo = res.data
+					this.collectionParams.owner=res.data.EthAddr
+					this.likeCollParams.address=res.data.EthAddr
 				})
 			},
-			CreateCollection() {
-				console.log(111);
-				this.AddCollectionVisible = true
-			},
-			
 			cancelFollow() {
-				cancelFollowing(this.userinfo.EthAddr).then(res=>{
-					this.userinfo.Followed=false
-					this.userinfo.TotalFollowers--
-				})
+				if(this.islogin){
+					cancelFollowing(this.userinfo.EthAddr).then(res=>{
+						this.userinfo.Followed=false
+						this.userinfo.TotalFollowers--
+					})
+				}else{
+					this.dialogVisible = true;
+				}
+				
 			},
 			addfollow(){
-				followUser(this.userinfo.EthAddr).then(res=>{
-					console.log(res);
-					this.userinfo.Followed=true
-					this.userinfo.TotalFollowers++
-				})
+				if(this.islogin){
+					followUser(this.userinfo.EthAddr).then(res=>{
+						
+						this.userinfo.Followed=true
+						this.userinfo.TotalFollowers++
+					})
+				}else{
+					this.dialogVisible = true;
+				}
+				
 			},
 			
 
-
-			getUserInfo(address) {
-				getUserProfile()
-					.then(res => {
-						console.log(res);
-						this.userinfo = res.data
-						this.$contractBalances(this.$address).then(result => {
-							this.userinfo.balance = Web3.utils.fromWei(result + "", 'ether')
-							console.log("userifo", this.userinfo)
-						})
-					})
-					.catch(response => {
-						console.log(response);
-					});
-
-			},
 			getCollectionLists(){
 				
-				getCollectionList({owner:this.userinfo.EthAddr}).then(res=>{
-					console.log(res);
+				getCollectionList(this.collectionParams).then(res=>{
+					
+					this.TotalCollections=res.data.Count
 					if(res.data.Count>0){
 						
 					this.collections.push(...res.data.Collections)
@@ -410,13 +501,15 @@
 
 				}).catch()
 			},
-			getlogin() {},
+			getlogin() {
+				this.dialogVisible = true;
+			},
 			getUserDashboards(address) {
 				getUserDashboard({
 					address:address
 				})
 					.then(res => {
-						console.log(res);
+						
 						if (res.data.RecentUploads != null) {
 							let list = res.data.RecentUploads;
 							this.allFileMarketList = list
@@ -442,7 +535,9 @@
 					this.collections=[]
 					this.likeCollections=[]
 					this.likeCollParams.offset=0
+					this.collectionParams.offset=0
 					this.getCollectionLists()
+					this.getLikedCollections()
 				}
 			},
 			copyNumber(item) {

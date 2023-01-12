@@ -72,7 +72,7 @@
 			
 		},
 		created() {
-			console.log(this.userinfo)
+			
 			this.username = this.userinfo.Username
 			
 				this.userAvatar = this.userinfo.Avatar
@@ -108,7 +108,7 @@
 						avatar: this.userAvatar,
 						username: this.username
 					}).then(res => {
-						console.log(res);
+						
 						this.$saoloading.hide();
 						this.$emit('update:visible', false)
 						window.location.reload()
@@ -119,8 +119,7 @@
 				
 			},
 			handleAvatarSuccess(res, file) {
-				console.log(res);
-				console.log(file);
+				
 
 				// this.uploadForm.preview = URL.createObjectURL(file.raw);
 			},
@@ -139,7 +138,7 @@
 					utils.getFileAvatarBase64(file).then(base64 => {
 						this.userAvatar = base64;
 					}).catch(response => {
-						console.log(response)
+						
 					})
 				}
 				return isJPG && isLt10M;

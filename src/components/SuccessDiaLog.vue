@@ -70,9 +70,7 @@
 			};
 		},
 		created() {
-			// console.log(this.successBuyinginfo);
-			console.log(localStorage.getItem('successbuying'));
-
+			
 		},
 		methods: {
 			cancleDialog() {

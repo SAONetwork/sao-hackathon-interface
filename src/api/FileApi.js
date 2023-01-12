@@ -198,3 +198,10 @@ export let UnlikeCollComment = (query) => {
 	return http.delete(`comment/collection/like?commentId=${query}`)
 	// return http.delete(`comment/like/${query}`)
 };
+/**
+ * delete file
+ */
+export let deleteFile = (query) => {
+	return http.delete(`file/${query}`)
+	// return http.delete(`comment/like/${query}`)
+};

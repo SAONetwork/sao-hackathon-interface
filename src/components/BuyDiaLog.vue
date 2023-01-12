@@ -73,7 +73,7 @@ export default {
 		};
 	},
 	created() {
-		console.log(this.profileInfo);
+		
 	},
 	methods: {
 		cancleDialog() {
@@ -120,7 +120,7 @@ export default {
 		},
 		buy(address) {
 			this.$contractBuy(this.profileInfo.NftTokenId, this.profileInfo.Price * 1, address, res => {
-				console.log(res);
+				
 				if (res === 4) {
 					this.$saoloading.hide();
 					// this.$emit("update:visible", false);

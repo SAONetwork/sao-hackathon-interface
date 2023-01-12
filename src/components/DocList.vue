@@ -193,7 +193,7 @@
 				alreadyStarIndex:0,
 				addCollParams:{
 					offset:0,
-					limit:6,
+					limit:10,
 					fileId:0,
 					owner:''
 				},
@@ -209,12 +209,12 @@
 			}
 		},
 		watch:{
-			showIntoCollection(old,news){
-				if(old==false){
-					this.intoCollectionList=[]
-					this.addCollParams.offset=0
-				}
-			}
+			// showIntoCollection(old,news){
+			// 	if(old==false){
+			// 		this.intoCollectionList=[]
+			// 		this.addCollParams.offset=0
+			// 	}
+			// }
 		},
 		mounted() {
 			this.$checkConnectedAndNetwork().then(({
@@ -252,8 +252,9 @@
 				getCollectionList(this.addCollParams).then(res=>{
 					this.intoCount=res.data.Count
 					if(res.data.Count>0){
-						let arr=res.data.Collections
-						this.intoCollectionList=this.intoCollectionList.concat(arr)
+						this.intoCollectionList.push(...res.data.Collections)
+						// let arr=res.data.Collections
+						// this.intoCollectionList=this.intoCollectionList.concat(arr)
 					}
 				})
 				this.alreadyStarIndex=index
@@ -261,6 +262,8 @@
 			colthisFile(item,index){
 				this.intoFileId=item.Id
 				this.showIntoCollection=true
+				this.intoCollectionList=[]
+				this.addCollParams.offset=0
 				this.getCollectionLists(item.Id,index)
 				// item.Star=true
 			},
@@ -268,6 +271,8 @@
 				// item.Star=false
 				this.intoFileId=item.Id
 				this.showIntoCollection=true
+				this.intoCollectionList=[]
+				this.addCollParams.offset=0
 				this.getCollectionLists(item.Id,index)
 			},
 			// colthisFile(item,index){
@@ -293,7 +298,7 @@
 				this.$emit("loginwallet", true);
 			},
 			checkinfo(item) {
-				console.log(item)
+				
 				if (item.FileCategory == "Video") {
 					let routeData = this.$router.resolve({
 						path: 'VideoFile',
@@ -322,7 +327,7 @@
 			},
 			Download(item) {
 
-				console.log(item);
+				
 				download(item.Id).then(res => {
 					const url = window.URL.createObjectURL(new Blob([res.data]));
 					const link = document.createElement('a');

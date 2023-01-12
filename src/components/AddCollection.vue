@@ -6,7 +6,7 @@
 					<img class="dialogback" src="@/assets/images/Common/addcollBg.png" alt="" />
 					<div class="dialogmess">
 						<div class="dialoghead">
-							<span>Create new collection</span>
+							<span>{{title}}</span>
 							<i class="el-icon-close" @click="cancleDialog"></i>
 						</div>
 					</div>
@@ -20,7 +20,7 @@
 										:before-upload="beforeAvatarUpload">
 										<div v-if="isEdit">
 											<img class="preview-cover" v-if="uploadForm.preview"
-												:src="'data:image/png;base64,'+ uploadForm.preview">
+												:src="uploadForm.preview">
 											<div class="avatar-uploader-bg" v-else>
 												<img class="addicon" src="@/assets/images/Upload/add.png" alt="">
 											</div>
@@ -35,7 +35,7 @@
 									</el-upload>
 									<div class="covers-tig">
 										<div class="covers-warn">
-											<span>Support JPG, JPEG, PNG</span>
+											<span>Support JPG, JPEG, PNG, GIF</span>
 											<span>Max size: 6 MB</span>
 										</div>
 										<MiniHollowBtn @MHoBtn='randomCover' :btnstyle='Randombtnstyle'>
@@ -67,7 +67,7 @@
 						
 										<div class="Alltags" v-if="uploadForm.labels.length>0" :style="{'flex-wrap': uploadForm.labels.length > 3 ?'wrap': 'inherit'}">
 											<div class="single-tag" v-for="(v,i) in uploadForm.labels" :key="i">
-												<span class="">{{v}}</span>
+												<span class="">{{v|ellipsis}}</span>
 												<i @click="deleteTag(v,i)" class="el-icon-close"></i>
 											</div>
 										</div>
@@ -107,7 +107,10 @@
 						<BorderBtn class="padingstyle" @onClickBtn="cancleDialog" :btnText='BorderbtnText'
 							:btnstyle='uploadbtnstyle'>
 						</BorderBtn>
-						<ActiveBtn class="padingstyle" @onClickBtn="saveUserInfo" :btnText='SolidbtnText'
+						<ActiveBtn v-if="btnRules" class="padingstyle" @onClickBtn="saveUserInfo" :btnText='SolidbtnText'
+							:btnstyle='Savebtnstyle'>
+						</ActiveBtn>
+						<ActiveBtn v-else class="padingstyle"  :btnText='SolidbtnText'
 							:btnstyle='Savebtnstyle'>
 						</ActiveBtn>
 					</div>
@@ -137,7 +140,7 @@ export default {
 		},
 		title: {
 			type: String,
-			default: ''
+			default: 'Create new collection'
 		},
 		profileInfo: {
 			type: Object,
@@ -146,20 +149,39 @@ export default {
 		editCollection:{
 			type: Object,
 			default: () => {}
-		}
+		},
+		
 	},
 	components: {
 		ActiveBtn,
 		ChangeRinkeby,MiniHollowBtn,BorderBtn
 	},
+	filters: {
+	 
+	  ellipsis(value) {
+	    if (!value) return "";
+	    if (value.length > 20) {
+	     
+	      return (
+	        value
+	          .replace(/&nbsp;/g, "")
+	          .replace("<br>", "")
+	          .replace(/\s/g, "")
+	          .slice(0, 20) + "..."
+	      );
+	    }
+	    return value.replace(/\n/g, "<br>");
+	  }
+	},
 	data() {
 		return {
+			btnRules:false,
 			isEdit:true,
 			confirmloading:true,
 			uploadApi: config.baseApi + "file/upload",
 			israndom:false,
 			showtigborder: false,
-			accept: ".jpg,.png,.jpeg",
+			accept: ".jpg,.png,.jpeg,.gif",
 			inputTags: "",
 			BorderbtnText: "BACK",
 			SolidbtnText: 'SAVE',
@@ -176,7 +198,7 @@ export default {
 				title: "",
 				description: "",
 				labels: [],
-				type: 0,
+				type: 1,
 				id: "",
 				AdditionalInfo:''
 			},
@@ -189,10 +211,7 @@ export default {
 	watch:{
 		editCollection:{
 			handler(item1,item2){
-				console.log(item2);
-				console.log(item1);
-				// item1.labels=item1.labels.split(',')
-				console.log(item1);
+				
 				if(item1){
 					this.isEdit=false
 					this.uploadForm.description=item1.Description
@@ -201,18 +220,27 @@ export default {
 					this.uploadForm.type=item1.Type
 					this.uploadForm.Id=item1.Id
 					this.uploadForm.labels=item1.Labels.split(',')
-					// id: this.uploadForm.fileId,
-					// labels: this.uploadForm.labels.join(","),
-					// ethAddr: "0x8a3787baa7b5024A6a8229a8eCe70761e0Fc4Fc8",
-					// this.uploadForm=item1
-					// this.uploadForm.labels=[]
 				}
 			},
 			deep:true
+		},
+		uploadForm: {
+			handler(newValue, oldValue) {
+				
+				if (
+					newValue.preview !='' &&
+					newValue.title !='' &&
+					newValue.labels.length > 0
+				) {
+					this.btnRules = true;
+				} else {
+					this.btnRules = false;
+				}
+			},
+			deep: true
 		}
 	},
 	created() {
-		// console.log(this.editCollection);
 	},
 	methods: {
 		blurDesc(){
@@ -223,7 +251,7 @@ export default {
 			const formData = new FormData()
 			formData.append('desc', this.uploadForm.description)
 			collectionTag(formData).then(res=>{
-				console.log(res.data);
+				
 				if(res.data != ''){
 				
 					this.recommendedTags=res.data.split(',')
@@ -256,34 +284,34 @@ export default {
 				}
 			}
 			createCollection(params).then(res=>{
+				
 				this.uploadForm={
 					preview: "",
 					title: "",
 					description: "",
 					labels: [],
-					type: 0,
+					type: 1,
 					id: "",
-					AdditionalInfo:''
+					AdditionalInfo:'',
+					
 				}
+				this.recommendedTags=[]
 				this.$emit('getlistagain')
 				this.confirmloading=true
 				this.cancleDialog()
 				
-				console.log(res);
 			}).catch(response=>{
 				this.cancleDialog()
 				this.confirmloading=true
 			})
 		},
 		handleAvatarSuccess(res, file) {
-			console.log(res);
-			console.log(file);
 		
 			// this.uploadForm.preview = URL.createObjectURL(file.raw);
 		},
 		beforeAvatarUpload(file, files) {
 			this.isEdit=true
-			let rules = ["image/jpeg", "image/jpg", "image/svg", "image/png"];
+			let rules = ["image/jpeg", "image/jpg", "image/svg", "image/png","image/gif"];
 			const isJPG = rules.some(item => {
 				return file.type == item;
 			});
@@ -293,9 +321,9 @@ export default {
 				this.$message.error("MAX 6MB!");
 			}
 			if (isLt6M && isJPG) {
-				utils.getFileBase64(file).then(base64 => {
+				utils.getFileAvatarBase64(file).then(base64 => {
 					this.uploadForm.preview = base64;
-					console.log(this.uploadForm.preview)
+					
 				});
 			}
 			return isJPG && isLt6M;
@@ -310,12 +338,11 @@ export default {
 			utils.getImgBase64(imgs).then(res => {
 				this.uploadForm.preview = res;
 				this.israndom = false;
-				console.log(res);
+				
 			});
 		},
 		deleteTag(v, i) {
-			console.log(v);
-			console.log(i);
+			
 			this.uploadForm.labels.splice(i, 1);
 		},
 		focusOn() {
@@ -334,11 +361,11 @@ export default {
 				let booleans = this.uploadForm.labels.find(item => {
 					return item.toLowerCase() == this.inputTags.toLowerCase()
 				})
-				console.log(booleans)
+				
 				if (!booleans) {
 					this.uploadForm.labels.push(this.inputTags);
 				}
-				console.log(this.uploadForm.labels)
+				
 			}
 			this.inputTags = "";
 		},
@@ -385,79 +412,26 @@ export default {
 				let booleans = this.uploadForm.labels.find(item => {
 					return item.toLowerCase() == v.toLowerCase()
 				})
-				console.log(booleans)
+				
 				if (!booleans) {
 					this.uploadForm.labels.push(v);
 				}
-				console.log(this.uploadForm.labels)
+				c
 			}
 		},
 		cancleDialog() {
 			this.$emit('update:visible', false);
-			this.uploadForm={
-				preview: "",
-				title: "",
-				description: "",
-				labels: [],
-				type: 0,
-				id: "",
-				AdditionalInfo:''
-			}
+			// this.uploadForm={
+			// 	preview: "",
+			// 	title: "",
+			// 	description: "",
+			// 	labels: [],
+			// 	type: 0,
+			// 	id: "",
+			// 	AdditionalInfo:''
+			// }
 		},
-		buynow() {
-			this.$checkConnectedAndNetwork().then(({ network, connected }) => {
-				this.ChangeRinkebyVisible = !network && network !== undefined;
-
-				if (network) {
-					this.$getWalletAddress().then(address => {
-						if (address) {
-							this.$saoloading.show('Loading', 'ball');
-							this.$emit('update:visible', false);
-
-							let currentSign = utils.getCurrentSign(address);
-							if (!currentSign) {
-								let signaturemessage = config.signMessage + address;
-								this.$sign(signaturemessage, address)
-									.then(signature => {
-										let sign = {
-											address,
-											signaturemessage,
-											signature
-										};
-										localStorage.setItem(config.localStorageSignKey, JSON.stringify(sign));
-										utils.setSignList(sign);
-										this.buy(address);
-										this.$emit("successbuy", this.profileInfo);
-									})
-									.catch(() => {
-										this.$saoloading.hide();
-										this.$emit('buyingFall', this.profileInfo);
-									});
-							} else {
-								this.buy(address);
-							}
-						} else {
-							this.$message.error('please connect wallet');
-						}
-					});
-				}
-			});
-		},
-		buy(address) {
-			this.$contractBuy(this.profileInfo.NftTokenId, this.profileInfo.Price * 1, address, res => {
-				console.log(res);
-				if (res === 4) {
-					this.$saoloading.hide();
-					// this.$emit("update:visible", false);
-					this.$emit('successbuy', this.profileInfo);
-				}
-				if (res == 'error') {
-					this.$saoloading.hide();
-					// this.$emit("update:visible", false);
-					this.$emit('buyingFall', this.profileInfo);
-				}
-			});
-		}
+	
 	}
 };
 </script>
@@ -819,6 +793,7 @@ export default {
 					background: #d6df68;
 					padding: 0px 5px;
 					height: 20px;
+					line-height: 20px;
 					font-size: 12px;
 					color: #001e13;
 					border-radius: 15px;

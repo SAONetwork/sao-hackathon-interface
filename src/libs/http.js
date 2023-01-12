@@ -14,7 +14,7 @@ const http = axios.create({
 // Request interception
 http.interceptors.request.use(function(header) {
 	let headersConfig = utils.getHeadserConfig();
-	console.log(headersConfig);
+	
 	if (headersConfig) {
 		header.headers = Object.assign(header.headers, headersConfig);
 	}

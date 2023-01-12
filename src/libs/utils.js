@@ -72,7 +72,7 @@ export default {
 				img.setAttribute("crossOrigin", 'Anonymous')
 				ctx.drawImage(img, 0, 0, img.width, img.height);
 				var ext = img.src.substring(img.src.lastIndexOf(".") + 1).toLowerCase();
-				var base64 = canvas.toDataURL("image/" + ext).split("base64,")[1];
+				var base64 = canvas.toDataURL("image/" + ext);
 				resolve(base64)
 			}
 			img.src = url + '?v=' + Math.random()
@@ -103,7 +103,7 @@ export default {
 		return num;
 	},
 	getFileSize(val) {
-		console.log("val", val);
+		
 		if (!val) return "";
 		if (val < 102.4) {
 			return val + " B";

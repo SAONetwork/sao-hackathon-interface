@@ -3,8 +3,7 @@
 	<transition name="dialog-fade">
 		<div class="dialog" v-if="visible" @click.self="cancleDialog">
 			<div class="dialoginfo">
-				<div class="title">Please switch to a supported
-					network (BSC Testnet)</div>
+				<div class="title">Please switch to a supported network (BSC Testnet)</div>
 					<div class="btn">
 						<BorderBtn class="padingstyle" @onClickBtn="cancleDialog" :btnText='BorderbtnText' :btnstyle='uploadbtnstyle'>
 						</BorderBtn>
@@ -82,7 +81,7 @@
 		
 			transform: translate(-50%, -50%);
 			.title{
-				padding: 33px 86px 20PX 86px;
+				padding: 33px 70px 20PX 70px;
 				width: 100%;
 				box-sizing: border-box;
 				text-align: center;

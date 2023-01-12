@@ -144,11 +144,13 @@
 	import HollowBtn from "@/components/HollowBtn.vue";
 	import ActiveBtn from "@/components/ActiveBtn.vue";
 	import AddCollection from '@/components/AddCollection.vue'
+	
 	export default {
 		components: {
 			HollowBtn,
 			ActiveBtn,
-			AddCollection
+			AddCollection,
+			
 		},
 		props: {
 			FileList: {
@@ -159,6 +161,7 @@
 		data() {
 			return {
 				btnText: "CONNECT WALLET",
+				
 				btnstyles: 'small',
 				userDetilas: {},
 				islogin: false,
@@ -171,7 +174,7 @@
 				alreadyStarIndex:0,
 				addCollParams:{
 					offset:0,
-					limit:6,
+					limit:10,
 					fileId:0,
 					owner:''
 				},
@@ -179,12 +182,12 @@
 			};
 		},
 		watch:{
-			showIntoCollection(old,news){
-				if(old==false){
-					this.intoCollectionList=[]
-					this.addCollParams.offset=0
-				}
-			}
+			// showIntoCollection(old,news){
+			// 	if(old==false){
+			// 		this.intoCollectionList=[]
+			// 		this.addCollParams.offset=0
+			// 	}
+			// }
 		},
 		filters: {
 			numRounding(num) {
@@ -203,6 +206,9 @@
 
 				if (connected) {
 					this.$getWalletAddress().then(address => {
+						
+							this.addCollParams.owner= utils.getUser().EthAddr
+						
 						this.address = address;
 						this.islogin = this.address ? true : false;
 					});
@@ -210,7 +216,8 @@
 			})
 		},
 		created() {
-			this.addCollParams.owner= utils.getUser().EthAddr
+			
+			
 		},
 		methods: {
 			loadMoreColl(){
@@ -228,25 +235,40 @@
 				this.addCollParams.fileId=val
 				getCollectionList(this.addCollParams).then(res=>{
 					this.intoCount=res.data.Count
-					if(res.data.Count>0){
-						let arr=res.data.Collections
-						this.intoCollectionList=this.intoCollectionList.concat(arr)
+					
+					if(res.data.Count>0 || res.data.Collections != null){
+						this.intoCollectionList.push(...res.data.Collections)
+						// let arr=res.data.Collections
+						// this.intoCollectionList=this.intoCollectionList.concat(arr)
 					}
 				})
-				this.alreadyStarIndex=index
+				this.$emit("loginwallet", true);
 			},
 			colthisFile(item,index){
-				this.intoFileId=item.Id
-				this.showIntoCollection=true
-				this.getCollectionLists(item.Id,index)
+				if(this.islogin){
+					this.intoFileId=item.Id
+					this.showIntoCollection=true
+					this.intoCollectionList=[]
+					this.addCollParams.offset=0
+					this.getCollectionLists(item.Id,index)
+				}else{
+					this.$emit("loginwallet", true);
+				}
+				
 				// item.Star=true
 			},
 			cancelcol(item,index){
-				console.log(item);
+				if(this.islogin){
+					
 				this.intoFileId=item.Id
 				// item.Star=false
 				this.showIntoCollection=true
+				this.intoCollectionList=[]
+				this.addCollParams.offset=0
 				this.getCollectionLists(item.Id,index)
+				}else{
+					this.dialogVisible = true;
+				}
 			},
 			extraPrice(str) {
 				return str.replace(/^(\-)*(\d+)\.(\d\d\d\d).*$/)
@@ -264,7 +286,7 @@
 				this.$emit("loginwallet", true);
 			},
 			checkinfo(item) {
-				console.log(item)
+				
 				if (item.FileCategory == "Video") {
 					let routeData = this.$router.resolve({
 						path: 'VideoFile',
@@ -293,9 +315,6 @@
 			},
 			Download(item) {
 				download(item.Id).then(res => {
-
-					console.log(res.headers);
-					console.log(res.headers["content-disposition"]);
 
 					const url = window.URL.createObjectURL(new Blob([res.data]));
 					const link = document.createElement('a');

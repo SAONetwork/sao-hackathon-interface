@@ -149,7 +149,7 @@
 		},
 		methods: {
 			gosearch(){
-				console.log(this.input);
+			
 				if(this.input===''){
 					return
 				}else{
@@ -167,12 +167,12 @@
 			getUserInfo() {
 				getUserProfile()
 					.then(res => {
-						console.log(res);
+						
 						this.userinfo = res.data
 						localStorage.setItem(config.localStorageUserKey, JSON.stringify(res.data));
 					})
 					.catch(response => {
-						console.log(response);
+						
 					});
 
 			},
@@ -198,8 +198,7 @@
 				this.dialogVisible = true;
 			},
 			closedia(value) {
-				console.log(value);
-
+				
 				this.dialogVisible = value;
 			},
 			gotoupload() {

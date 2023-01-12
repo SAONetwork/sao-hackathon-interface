@@ -115,10 +115,11 @@
 			UserList
 		},
 		created() {
+			
 			this.searchInfo = this.$route.query.searchinfo
 			this.getFileList()
 		},
-		watch: { 
+		watch: {
 			$route(to, from) {
 			this.loading = true
 			this.searchInfo = to.query.searchinfo
@@ -138,11 +139,9 @@
 				}
 
 				getSearch(obj).then(res => {
-					console.log(res);
+					
 					this.loading = false
-					// this.fileTotal = res.data.Total
-					// this.showMarket = false
-					// this.cancelloading=true
+					
 					if (res.data != null && res.data != []) {
 						res.data.forEach(item => {
 							item.iscol = true

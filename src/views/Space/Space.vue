@@ -187,6 +187,19 @@
 				}
 			};
 		},
+		 mounted(){
+			 history.pushState(null, null, document.URL)
+			 window.addEventListener(
+			   'popstate',
+			   () => {
+			   		
+			         history.pushState(null, null, document.URL)
+			   },
+			   false
+			 )
+		  },
+		
+
 		created() {
 			this.$nextTick(()=>{
 				var eWidth = this.$refs.markets.clientWidth
@@ -209,14 +222,9 @@
 
 			},
 			getFileList() {
-				// if (this.showlist == false) {
-				// 	this.showMarket = true
-
-				// } else {
-				// 	this.showMarket = false
-				// }
+				
 				fileInfos(this.fileParams).then(res => {
-					console.log(res);
+					
 					this.fileTotal = res.data.Total
 					this.showMarket = false
 					// this.cancelloading=true
@@ -232,9 +240,7 @@
 			},
 			changeSelect(index) {
 				this.showMarket = true
-				console.log(this.selcectedValue);
-				console.log(this.selcectedValue[index]);
-				console.log(this.selcectedValue);
+				
 				// price
 				if (index == 0) {
 					this.fileParams.offset = 0
@@ -287,19 +293,15 @@
 				this.dialogVisible = true;
 			},
 			buyprofile(item) {
-				console.log(item);
+				
 				this.buyDialogVisible = true;
 				this.buyinginfo = item;
 			},
 			successbuy(item) {
-				console.log("success:", item);
+				
 				this.successVisible = true;
 				this.successBuyinginfo = item;
-				// this.FileMarketList.forEach(item => {
-				//   if(item){
-
-				//   }
-				// });
+				
 			},
 			buyingFall(item) {
 				this.fallVisible = true
