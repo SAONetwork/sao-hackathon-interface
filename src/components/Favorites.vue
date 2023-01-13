@@ -93,6 +93,15 @@
 				// ]
 			}
 		},
+		watch:{
+			AddCollectionVisible(val1,val2){
+				
+				if(val1==false){
+					this.readyEditColl={
+					}
+				}
+			}
+		},
 		filters:{
 			filterTime(val){
 				return moment(new Date(val)).format('YYYY-MM-DD')

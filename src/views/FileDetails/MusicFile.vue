@@ -335,13 +335,21 @@
 		
 		methods: {
 			gotoProfile(){
-				let routeData = this.$router.resolve({
-					path: 'OtherProfile',
-					query: {
-						address: this.fileParams.EthAddr
-					}
-				})
-				window.open(routeData.href, '_blank');
+				if(this.address!==this.fileParams.EthAddr.toLowerCase()){
+					let routeData = this.$router.resolve({
+						path: 'OtherProfile',
+						query: {
+							address: this.fileParams.EthAddr
+						}
+					})
+					window.open(routeData.href, '_blank');
+				}else{
+					let routeData = this.$router.resolve({
+						path: 'Profile'
+					})
+					window.open(routeData.href, '_blank');
+					
+				}
 			},
 			getCopyUrl(){
 				let url =window.location.href

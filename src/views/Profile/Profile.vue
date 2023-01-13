@@ -427,7 +427,7 @@
 						}
 					});
 				} else {
-					location.href = "https://harmonious-treacle-9cadd3.netlify.app";
+					location.href = "https://demo.storverse.app";
 				}
 			})
 			this.$refs.scrollbar.handleScroll=()=>{
@@ -870,6 +870,7 @@
 
 					.user-details {
 						width: 80%;
+						height: 90px;
 						overflow: hidden;
 						position: relative;
 						font-size: 14px;

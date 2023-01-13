@@ -213,13 +213,17 @@ export default {
 			handler(item1,item2){
 				
 				if(item1){
+					if(item1.Labels){
+						this.uploadForm.labels=item1.Labels.split(',')
+					}else{
+						this.uploadForm.labels=[]
+					}
 					this.isEdit=false
 					this.uploadForm.description=item1.Description
 					this.uploadForm.title=item1.Title
 					this.uploadForm.preview=item1.Preview
 					this.uploadForm.type=item1.Type
 					this.uploadForm.Id=item1.Id
-					this.uploadForm.labels=item1.Labels.split(',')
 				}
 			},
 			deep:true
@@ -262,6 +266,7 @@ export default {
 		saveUserInfo(){
 			
 			this.confirmloading=false
+			this.btnRules = false
 			let params={}
 			if( this.uploadForm.preview.includes('https')){
 				 params={

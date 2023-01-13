@@ -242,7 +242,8 @@
 						// this.intoCollectionList=this.intoCollectionList.concat(arr)
 					}
 				})
-				this.$emit("loginwallet", true);
+				this.alreadyStarIndex=index
+				// this.$emit("loginwallet", true);
 			},
 			colthisFile(item,index){
 				if(this.islogin){
