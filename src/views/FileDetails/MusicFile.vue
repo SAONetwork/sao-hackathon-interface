@@ -67,9 +67,12 @@
 					</div>
 				</div>
 			</div>
+			<el-scrollbar style="height: 80px;width: 900px;">
 			<div class="filedesc">
 				{{fileParams.Description}}
 			</div>
+			</el-scrollbar>
+			
 			<div class="ipfsandcointitle">
 				<span> Ipfs Pinned:&nbsp;</span> <span class="ipfsandcoin">{{fileParams.IpfsHash}}</span>
 			</div>
@@ -130,10 +133,9 @@
 					   popper-class="popoverBackB"
 					  >
 						<div class="shareBroad">
-							<div class="single-share">
-								<a
-								        href="javascript:window.open('http://twitter.com/home?status='+encodeURIComponent(document.location.href)+' '+encodeURIComponent(document.title),'_blank','toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=600, height=450,top=100,left=350');void(0)">
-								       <img class="twitter" src="@/assets/images/Market/twitter.png" alt=""> Share to Twitter </a>
+							<div class="single-share" @click="shareTwitter">
+								<img  class="twitter" src="@/assets/images/Market/twitter.png" alt="">
+								<span >Share to Twitter</span>
 								
 							</div>
 							<div class="single-share">
@@ -334,6 +336,23 @@
 		},
 		
 		methods: {
+			shareTwitter() {
+				let url =document.location.href
+				console.log(url);
+				let title =document.title
+				console.log(title);
+			      function popupwindow(url, title) {
+			        return window.open(
+			          "https://twitter.com/intent/tweet?url=" +
+			            encodeURIComponent(url) +
+			            "&text=" +
+			            encodeURIComponent(title),
+			          "_blank",
+			          "toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=600, height=450,top=100,left=350"
+			        );
+			      }
+			      popupwindow(url, title);
+			    },
 			gotoProfile(){
 				if(this.address!==this.fileParams.EthAddr.toLowerCase()){
 					let routeData = this.$router.resolve({
@@ -732,7 +751,6 @@ a{ text-decoration: none;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-
 		.musicplayer {
 			display: flex;
 			align-items: center;
@@ -863,7 +881,7 @@ a{ text-decoration: none;
 			line-height: 16px;
 			color: #58FFC3;
 			padding-bottom: 13px;
-			margin-top: 20px;
+			// margin-top: 20px;
 			word-break: break-all;
 		}
 
@@ -874,6 +892,7 @@ a{ text-decoration: none;
 			font-size: 12px;
 			line-height: 16px;
 			padding-bottom: 13px;
+			margin-top: 10px;
 		}
 
 		.ipfsandcoin {

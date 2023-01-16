@@ -110,7 +110,7 @@
 
 						</el-form-item>
 						<el-form-item label="Description">
-							<el-input type="textarea" autosize maxlength="300" placeholder="300 characters or less."
+							<el-input type="textarea" autosize maxlength="2000" placeholder="2000 characters or less."
 								class="preview-Description" v-model="uploadForm.description"
 								@blur="uploadForm.description=uploadForm.description.replace(/^\s+|\s+$/g,'')">
 							</el-input>

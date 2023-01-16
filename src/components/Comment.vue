@@ -267,6 +267,7 @@
 				box-sizing: border-box;
 				
 				.reply{
+					word-break: break-all;
 					color: #58FFC3;
 					margin: 0 20px;
 				}
@@ -274,6 +275,7 @@
 					width: 15px;
 					height: 15px;
 					cursor: pointer;
+					
 				}
 			}
 		}
@@ -332,7 +334,7 @@
 						font-weight: 400;
 						font-size: 14px;
 						line-height: 18px;
-						
+						word-break: break-all;
 						color: #58FFC3;
 					}
 					.otherscomment{
@@ -370,6 +372,7 @@
 							}
 						}
 						.otherscommentbody{
+							word-wrap: break-word;
 							width: 770px;
 						}
 					}

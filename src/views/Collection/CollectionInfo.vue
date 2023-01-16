@@ -24,18 +24,18 @@
 							<div class="gap"></div>
 							<span class="infostyle"> Uploaded at&nbsp;{{fileParams.CreatedAt}}</span>
 							<div class="gap"></div>
-							<span class="infostyle">{{fileParams.TotalFiles}} Files</span>
+							<span class="infostyle" v-if="fileParams.TotalFiles>1">{{fileParams.TotalFiles}} Files</span>
+							<span class="infostyle" v-else>{{fileParams.TotalFiles}} File</span>
 							<!-- <div class="gap"></div> -->
 							<!-- <span class="infostyle">{{fileParams.fileType}}</span> -->
 							
 							<!-- <div class="gap"></div> -->
 							<!-- <span class="infostyle">{{fileParams.fileSize}}</span> -->
 						</div>
+						<el-scrollbar class="desc-scroll">
 						<span class="filedesc">
 							{{fileParams.Description}}</span>
-						<!-- <div class="ipfsandcointitle">
-							<span> Ipfs Pinned:&nbsp;</span> <span class="ipfsandcoin"> {{fileParams.IpfsHash}}</span>
-						</div> -->
+						</el-scrollbar>
 						
 						<div class="filelabels">
 							<span class="tagstyle" v-for="(v,i) in fileParams.Labels" :key="i">{{v}}</span>
@@ -65,12 +65,17 @@
 								   popper-class="popoverBackB"
 								  >
 									<div class="shareBroad">
-										<div class="single-share">
+										
+										<div class="single-share" @click="shareTwitter">
+											<img  class="twitter" src="@/assets/images/Market/twitter.png" alt="">
+											<span >Share to Twitter</span>
+											
+										</div>
+										<!-- <div class="single-share">
 											<a
 											        href="javascript:window.open('http://twitter.com/home?status='+encodeURIComponent(document.location.href)+' '+encodeURIComponent(document.title),'_blank','toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=600, height=450,top=100,left=350');void(0)">
 											       <img class="twitter" src="@/assets/images/Market/twitter.png" alt=""> Share to Twitter </a>
-											
-										</div>
+											</div> -->
 										<div class="single-share">
 											
 											 <a
@@ -211,6 +216,8 @@
 				collectionId:0,
 				commentList:[],
 				iscopy: false,
+				
+				
 			}
 		},
 		components: {
@@ -243,9 +250,26 @@
 			this.getAboutComment()
 		},
 		mounted() {
-			
+						
 		},
 		methods: {
+			shareTwitter() {
+				let url =document.location.href
+				console.log(url);
+				let title =document.title
+				console.log(title);
+			      function popupwindow(url, title) {
+			        return window.open(
+			          "https://twitter.com/intent/tweet?url=" +
+			            encodeURIComponent(url) +
+			            "&text=" +
+			            encodeURIComponent(title),
+			          "_blank",
+			          "toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=600, height=450,top=100,left=350"
+			        );
+			      }
+			      popupwindow(url, title);
+			    },
 			gotoProfile(){
 				if(this.address!==this.fileParams.EthAddr.toLowerCase()){
 					let routeData = this.$router.resolve({
@@ -264,6 +288,7 @@
 				}
 			},
 			getCopyUrl(){
+				
 				let url =window.location.href
 				
 				var cInput = document.createElement("input");
@@ -584,7 +609,17 @@
 		}
 
 	}
-
+.desc-scroll{
+	height: 80px;
+	.filedesc {
+		font-size: 12px;
+		line-height: 16px;
+		color: #58FFC3;
+		padding: 8px 0;
+		width: 570px;
+		word-wrap: break-word;
+	}
+}
 a{ text-decoration: none; 
 		color: #68B096;
 		display: flex;
@@ -680,22 +715,37 @@ a{ text-decoration: none;
 						cursor: pointer;
 					}
 				}
-
-				.filedesc {
-					font-size: 12px;
-					line-height: 16px;
-					color: #58FFC3;
-					padding: 8px 0;
+				.bottom {
 					width: 570px;
-					word-wrap: break-word;
-					// word-break: break-all;
-					// text-overflow: ellipsis;
-					// display: -webkit-box;
-					// -webkit-box-orient: vertical;
-					// -webkit-line-clamp: 6;
-					// overflow: hidden;
-
-				}
+					  position: relative;
+					  .room_intro {
+					    flex:1;
+					    font-size: 12px;
+					    font-weight: 400;
+					    line-height: 16px;
+						color: #58FFC3;
+					    text-align: justify;
+					  }
+					  .showEllipsis{
+					    overflow: hidden;
+					    text-overflow: ellipsis;
+					    display: -webkit-box;
+					    -webkit-line-clamp: 3;
+					    line-clamp: 3;
+					    -webkit-box-orient: vertical;
+					  }
+					  .btnWrap {
+						  margin-top: 10px;
+						  font-size: 16px;
+					    // align-self: center;
+					    cursor: pointer;
+						.more{
+							justify-content: flex-end;
+							margin-top: 10px;
+						}
+					  }
+					}
+			
 
 				.ipfsandcointitle {
 					display: flex;

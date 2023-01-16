@@ -141,27 +141,14 @@
 							name: "Video"
 						}, {
 							name: "Music"
-						}, {
+						},
+						{
+							name: "Image"
+						},{
 							name: "Document"
 						}, {
 							name: "Other"
 						}],
-						selcectTabValue: ""
-					},
-					{
-						first: {
-							name: "All Formats"
-						},
-						secend: [{
-								name: "MP4"
-							},
-							{
-								name: "MP3"
-							},
-							{
-								name: "JPG"
-							}
-						],
 						selcectTabValue: ""
 					}
 				],
@@ -170,9 +157,6 @@
 					},
 					{
 						selcectTabValue: "All Types"
-					},
-					{
-						selcectTabValue: "All Formats"
 					}
 				],
 			

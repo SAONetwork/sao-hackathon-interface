@@ -26,8 +26,10 @@
 							<div class="gap"></div>
 							<span class="infostyle">{{fileParams.fileSize}}</span>
 						</div>
+						<el-scrollbar style="height: 80px;">
 						<span class="filedesc">
 							{{fileParams.Description}}</span>
+						</el-scrollbar>
 						<div class="ipfsandcointitle">
 							<span> Ipfs Pinned:&nbsp;</span> <span class="ipfsandcoin"> {{fileParams.IpfsHash}}</span>
 						</div>
@@ -91,10 +93,15 @@
 								   popper-class="popoverBackB"
 								  >
 									<div class="shareBroad">
-										<div class="single-share">
+										<!-- <div class="single-share">
 											<a
 											        href="javascript:window.open('http://twitter.com/home?status='+encodeURIComponent(document.location.href)+' '+encodeURIComponent(document.title),'_blank','toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=600, height=450,top=100,left=350');void(0)">
 											       <img class="twitter" src="@/assets/images/Market/twitter.png" alt=""> Share to Twitter </a>
+											
+										</div> -->
+										<div class="single-share" @click="shareTwitter">
+											<img  class="twitter" src="@/assets/images/Market/twitter.png" alt="">
+											<span >Share to Twitter</span>
 											
 										</div>
 										<div class="single-share">
@@ -288,6 +295,23 @@
 			    }
 		},
 		methods: {
+			shareTwitter() {
+				let url =document.location.href
+				console.log(url);
+				let title =document.title
+				console.log(title);
+			      function popupwindow(url, title) {
+			        return window.open(
+			          "https://twitter.com/intent/tweet?url=" +
+			            encodeURIComponent(url) +
+			            "&text=" +
+			            encodeURIComponent(title),
+			          "_blank",
+			          "toolbar=yes, location=yes, directories=no, status=no, menubar=yes, scrollbars=yes, resizable=no, copyhistory=yes, width=600, height=450,top=100,left=350"
+			        );
+			      }
+			      popupwindow(url, title);
+			    },
 			gotoProfile(){
 				if(this.address!==this.fileParams.EthAddr.toLowerCase()){
 					let routeData = this.$router.resolve({
@@ -714,12 +738,7 @@ a{ text-decoration: none;
 					padding: 8px 0;
 					width: 570px;
 					word-wrap: break-word;
-					// word-break: break-all;
-					// text-overflow: ellipsis;
-					// display: -webkit-box;
-					// -webkit-box-orient: vertical;
-					// -webkit-line-clamp: 6;
-					// overflow: hidden;
+					
 
 				}
 

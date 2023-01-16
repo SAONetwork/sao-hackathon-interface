@@ -23,11 +23,15 @@
 								<div class="userfinenumber">
 									<div class="finenumber">
 										<span class="finenumberdetails">{{userSummary.PublicUploads}}
-										</span><span>Files</span>
+										</span>
+										<span v-if="userSummary.PublicUploads>1">Files</span>
+										<span v-else>File</span>
 									</div>
 									<div class="finenumber">
 										<span class="finenumberdetails">{{userinfo.TotalCollections}}
-										</span><span>Collections</span>
+										</span>
+										<span v-if="userinfo.TotalCollections>1">Collections</span>
+										<span v-else>Collection</span>
 									</div>
 									<div class="finenumber followhands" @click="checkfollw(0)">
 										<span class="finenumberdetails">{{userinfo.TotalFollowings}}
@@ -214,14 +218,14 @@
 					<div class="Collectionhead">
 						<div class="Collectionhead-left">
 							<img class="homeheadicon" src="@/assets/images/Profile/data.png" alt="">
-							<span>Collection list</span>
+							<span>Collection List</span>
 						</div>
 						<div class="Collectionhead-right" @click='CreateCollection'>
 							<span>+ Create Collection</span>
 							<img class="hollowwalletBtnback" src="../../assets/images/Common/walletinfo.png" alt="" />
 						</div>
 					</div>
-					<div class="homeFileList">
+					<div class="homeFileList"  style="margin-top: 10px;">
 
 						
 						<Favorites v-if="collections.length>0" :favolist='collections' :isMine='isMine' @confirmDeleteColl='confirmDeleteColl' @updatecoll='getcollAgain'></Favorites>
@@ -234,7 +238,7 @@
 					</div>
 					<div class="Collectionhead" style="margin: 13px 0;">
 						<div class="Collectionhead-left">
-							
+							<img class="likedicon" src="@/assets/images/Common/cancellike.png" alt="">
 							<span>Liked</span>
 						</div>
 						
@@ -465,31 +469,38 @@
 		methods: {
 			checkfollw(val){
 				
-				this.FollowVisible=true
-					this.followList=[]
+				this.followList=[]
 				if(val==1){
-					this.followtitle='Follower'
-					getUserFollower({
-						address:this.userinfo.EthAddr
-					}).then(res=>{
-						
-						if(res.data){
-						this.followList=res.data
-						}else{
-							this.followList=[]
-						}
-					})
+					if(this.userinfo.TotalFollowers>0){
+						this.FollowVisible=true
+						this.followtitle='Follower'
+						getUserFollower({
+							address:this.userinfo.EthAddr
+						}).then(res=>{
+							
+							if(res.data){
+							this.followList=res.data
+							}else{
+								this.followList=[]
+							}
+						})
+					}
+					
 				}else{
-					this.followtitle='Following'
-					getUserFollowing({
-						address:this.userinfo.EthAddr
-					}).then(res=>{
-						if(res.data){
-						this.followList=res.data
-						}else{
-							this.followList=[]
-						}
-					})
+					if(this.userinfo.TotalFollowings>0){
+						this.FollowVisible=true
+						this.followtitle='Following'
+						getUserFollowing({
+							address:this.userinfo.EthAddr
+						}).then(res=>{
+							if(res.data){
+							this.followList=res.data
+							}else{
+								this.followList=[]
+							}
+						})
+					}
+					
 				}
 			},
 			loadMores(){
@@ -1034,7 +1045,11 @@
 					.Collectionhead-left {
 						display: flex;
 						align-items: center;
-
+						.likedicon{
+							width: 16px;
+							height: 16px;
+							margin-right: 7px;
+						}
 						.homeheadicon {
 							width: 27px;
 							height: 12px;

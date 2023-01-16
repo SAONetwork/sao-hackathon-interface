@@ -7,7 +7,7 @@
 
 				<div class="inputback">
 					<img class="searchimg" src="@/assets/images/Market/Group630.png" alt="" />
-					<input type="text" class="el-input__inner" style="position: relative;z-index: 999;width: 335px;"  placeholder="Search by filename, tags, description, etc." v-model="input" @keydown.enter="gosearch">
+					<input type="text" class="el-input__inner" style="position: relative;z-index: 999;width: 335px;"  placeholder="Search by title, tags, description, etc." v-model="input" @keydown.enter="gosearch">
 					    <span style="position: absolute;top: 12px;right: 10px;z-index: 9999;" @click="input=''" v-show="input"></span>
 					
 					

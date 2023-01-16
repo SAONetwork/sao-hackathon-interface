@@ -43,8 +43,11 @@
 			</div>
 		
 			<div class="deal-coll">
-				<div class="createdtime">
+				<div class="createdtime" v-if="item.TotalFiles>1">
 					{{item.TotalFiles}} files
+				</div>
+				<div class="createdtime" v-else>
+					{{item.TotalFiles}} file
 				</div>
 				<div class="edit-coll" @click.stop="editColl(item,index)" v-if="isMine">
 					<img src="../assets/images/Common/editicon.png" alt="">
@@ -310,6 +313,9 @@
 					
 				}
 			}
+		}
+		.singlefavo:nth-child(1){
+			margin-top: 0;
 		}
 		.deal-coll{
 			width: 155px;

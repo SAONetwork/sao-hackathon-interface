@@ -10,8 +10,9 @@
 							<i class="el-icon-close" @click="cancleDialog"></i>
 						</div>
 					</div>
-					<div class="tableform" v-show="confirmloading">
-						<el-form ref="uploadForm" :model="uploadForm" label-width="84px" label-position="left">
+					<el-scrollbar v-show="confirmloading">
+					<div class="tableform" >
+						<el-form ref="uploadForm" :model="uploadForm" label-width="100px" label-position="left">
 							<el-form-item label="Preview" :required="true">
 								<div class="uploadcover">
 									<el-upload v-loading="israndom" element-loading-background="rgba(0, 0, 0, 0.8)"
@@ -56,7 +57,7 @@
 						
 							</el-form-item>
 							<el-form-item label="Description">
-								<el-input type="textarea"  maxlength="300" placeholder="300 characters or less."
+								<el-input type="textarea"  maxlength="2000" placeholder="2000 characters or less."
 									class="preview-Description" resize='none' show-word-limit v-model="uploadForm.description"
 									@blur="blurDesc">
 								</el-input>
@@ -95,24 +96,27 @@
 									<el-radio :label="1">Privacy</el-radio>
 								</el-radio-group>
 								<div class="typetips">
-									* Public collection will be visible to others in SPACE.
+									* Make this favorite public and it will be searched
 								</div>
 							</el-form-item>
 						</el-form>
 					</div>
+					</el-scrollbar>
 					<div v-show="!confirmloading" class="confirmloadingstyle">
 						<img class="loadinggif" src="@/assets/images/Common/saoloading.gif" alt="">
 					</div>
-					<div class="btns">
-						<BorderBtn class="padingstyle" @onClickBtn="cancleDialog" :btnText='BorderbtnText'
-							:btnstyle='uploadbtnstyle'>
-						</BorderBtn>
+					<div class="btns" v-show="confirmloading">
+						
 						<ActiveBtn v-if="btnRules" class="padingstyle" @onClickBtn="saveUserInfo" :btnText='SolidbtnText'
 							:btnstyle='Savebtnstyle'>
 						</ActiveBtn>
-						<ActiveBtn v-else class="padingstyle"  :btnText='SolidbtnText'
+						<InactiveButton v-else class="padingstyle" :btnText='SolidbtnText' :btnstyle='UploadbtnStyle'></InactiveButton>
+						<!-- <ActiveBtn v-else class="padingstyle"  :btnText='SolidbtnText'
 							:btnstyle='Savebtnstyle'>
-						</ActiveBtn>
+						</ActiveBtn> -->
+						<BorderBtn class="padingstyle" @onClickBtn="cancleDialog" :btnText='BorderbtnText'
+							:btnstyle='uploadbtnstyles'>
+						</BorderBtn>
 					</div>
 				</div>
 			</div>
@@ -132,6 +136,7 @@ import utils from '../libs/utils.js';
 import ActiveBtn from "./ActiveBtn";
 	import BorderBtn from "./BorderBtn.vue";
 	import MiniHollowBtn from "@/components/MiniHollowBtn.vue";
+	import InactiveButton from "@/components/InactiveButton.vue";
 export default {
 	props: {
 		visible: {
@@ -154,7 +159,7 @@ export default {
 	},
 	components: {
 		ActiveBtn,
-		ChangeRinkeby,MiniHollowBtn,BorderBtn
+		ChangeRinkeby,MiniHollowBtn,BorderBtn,InactiveButton
 	},
 	filters: {
 	 
@@ -185,7 +190,7 @@ export default {
 			inputTags: "",
 			BorderbtnText: "BACK",
 			SolidbtnText: 'SAVE',
-			uploadbtnstyle: "other",
+			uploadbtnstyles: "other",
 			Savebtnstyle: "big",
 			recommendedTags: [],
 			Randombtnstyle: {
@@ -205,7 +210,11 @@ export default {
 			// visible:true
 			// uploadbtnstyle: 'middle',
 			DiaLogtitle: 'Connect wallet',
-			ChangeRinkebyVisible: false
+			ChangeRinkebyVisible: false,
+			UploadbtnStyle: {
+				width: "227px",
+				height: "44px"
+			},
 		};
 	},
 	watch:{
@@ -248,8 +257,13 @@ export default {
 	},
 	methods: {
 		blurDesc(){
-			this.uploadForm.description=this.uploadForm.description.replace(/^\s+|\s+$/g,'')
-			this.getcollectionTag()
+			if(this.uploadForm.description==''){
+				return
+			}else{
+				this.uploadForm.description=this.uploadForm.description.replace(/^\s+|\s+$/g,'')
+				this.getcollectionTag()
+			}
+			
 		},
 		getcollectionTag(){
 			const formData = new FormData()
@@ -358,11 +372,12 @@ export default {
 			this.showtigborder = false;
 		},
 		addTig() {
+			
 			this.inputTags = this.inputTags.replace(/^\s+|\s+$/g, "");
 			// this.uploadForm.tags.push(this.inputTags);
 			if (this.uploadForm.labels.length == 0) {
 				this.uploadForm.labels.push(this.inputTags);
-			} else {
+			} else if(this.uploadForm.labels.length > 0 && this.uploadForm.labels.length < 10 ){
 				let booleans = this.uploadForm.labels.find(item => {
 					return item.toLowerCase() == this.inputTags.toLowerCase()
 				})
@@ -370,6 +385,7 @@ export default {
 				if (!booleans) {
 					this.uploadForm.labels.push(this.inputTags);
 				}
+			}else {
 				
 			}
 			this.inputTags = "";
@@ -380,13 +396,15 @@ export default {
 				if (this.inputTags.length > 0) {
 					if (this.uploadForm.labels.length == 0) {
 						this.uploadForm.labels.push(this.inputTags);
-					} else {
+					}else if (this.uploadForm.labels.length > 0 && this.uploadForm.labels.length < 10 ) {
 						let booleans = this.uploadForm.labels.find(item => {
 							return item.toLowerCase() == this.inputTags.toLowerCase()
 						})
 						if (!booleans) {
 							this.uploadForm.labels.push(this.inputTags);
 						}
+					} else{
+						
 					}
 				}
 				this.inputTags = "";
@@ -396,13 +414,16 @@ export default {
 				if (this.inputTags.length > 0) {
 					if (this.uploadForm.labels.length == 0) {
 						this.uploadForm.labels.push(this.inputTags);
-					} else {
+					}else if(this.uploadForm.labels.length > 0 && this.uploadForm.labels.length < 10 ){
 						let booleans = this.uploadForm.labels.find(item => {
 							return item.toLowerCase() == this.inputTags.toLowerCase()
 						})
 						if (!booleans) {
 							this.uploadForm.labels.push(this.inputTags);
 						}
+					}
+					 else {
+						
 					}
 				}
 				this.inputTags = "";
@@ -421,7 +442,7 @@ export default {
 				if (!booleans) {
 					this.uploadForm.labels.push(v);
 				}
-				c
+				
 			}
 		},
 		cancleDialog() {
@@ -442,6 +463,15 @@ export default {
 </script>
 
 <style lang="less" scoped>
+	.el-scrollbar {
+		height: 470px;
+		min-width: 250px;
+	}
+	
+	.el-scrollbar ::v-deep .el-scrollbar__wrap {
+		overflow-y: scroll;
+		overflow-x: hidden;
+	}
 .dialog {
 	width: 100%;
 	height: 100%;
@@ -608,6 +638,7 @@ export default {
 			font-size: 14px;
 			line-height: 2.6em;
 			word-break: break-all;
+			padding: 0;
 			// margin-right: 40px;
 	
 		}
@@ -971,7 +1002,7 @@ export default {
 		align-items: center;
 		justify-content: center;
 		width: 100%;
-		height: 450px;
+		height: 470px;
 		.loadinggif{
 			width: 60px;
 			height: 60px;
@@ -981,7 +1012,8 @@ export default {
 	.btns{
 		display: flex;
 		align-items: center;
-		margin-left: 100px;
+		justify-content: center;
+		// margin-left: 100px;
 		.padingstyle{
 			margin-right: 15px;
 		}
