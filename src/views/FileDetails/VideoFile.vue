@@ -69,7 +69,7 @@
 					</span>
 				</div> -->
 				
-					<el-scrollbar style="height: 80px;" class="scrolldesc">
+					<el-scrollbar class="scrolldesc">
 					<div class="filedesc">
 						{{fileParams.Description}}
 					</div>
@@ -376,9 +376,9 @@
 		methods: {
 			shareTwitter() {
 				let url =document.location.href
-				console.log(url);
-				let title =document.title
-				console.log(title);
+				
+				let title = 'I found an interesting file! Check it out'
+				
 			      function popupwindow(url, title) {
 			        return window.open(
 			          "https://twitter.com/intent/tweet?url=" +
@@ -781,7 +781,15 @@
 			margin-right: -17px !important;
 			overflow: auto;
 		}
-
+		.scrolldesc{
+			max-height: 90px;
+			padding-bottom: 13px;
+			/deep/.el-scrollbar__view{
+			  width: 100%;
+			max-height: 90px;
+			}
+			
+		}
 	}
 	.scrolldesc{
 		// padding-bottom: 13px;
@@ -899,6 +907,8 @@ a{ text-decoration: none;
 				color: #58FFC3;
 				word-break: break-all;
 				padding-bottom: 13px;
+				// max-height: 70px;
+				// overflow-y: scroll;
 			}
 
 			.ipfsandcointitle {

@@ -24,8 +24,8 @@
 						Support JPG, PNG, etc.
 						Max size: 10M 
 					</div>
-					<div class="editname">
-						<el-input v-model="username" placeholder="User name" maxlength="36" show-word-limit></el-input>
+					<div :class="colorName?'colorNamered':'editname'">
+						<el-input @blur="blurName" v-model="username" placeholder="User name" maxlength="36" show-word-limit></el-input>
 					</div>
 					<div class="btns">
 						<BorderBtn class="padingstyle" @onClickBtn="cancleDialog" :btnText='BorderbtnText'
@@ -90,20 +90,33 @@
 				uploadbtnstyle: "other",
 				Savebtnstyle: "big",
 				SolidbtnText: 'SAVE',
-				showPiced: false
+				showPiced: false,
+				colorName:false
 			};
 		},
 		methods: {
+			blurName(){
+				if(this.username.length == 0||this.username.split(" ").join("").length == 0){
+					this.username=''
+					this.colorName=true
+					return
+				}else{
+					this.colorName=false
+				}
+			},
 			cancleDialog() {
 				this.$emit('update:visible', false)
 				// this.userAvatar = ''
 				// this.username = ''
 			},
 			saveUserInfo() {
-				if(this.username==''){
+				if(this.username.length == 0||this.username.split(" ").join("").length == 0){
+					this.username=''
+					this.colorName=true
 					return
 				}else{
 					this.$saoloading.show('Loading', 'ball');
+					this.colorName=false
 					update({
 						avatar: this.userAvatar,
 						username: this.username
@@ -250,7 +263,8 @@
 			.editname {
 				width: 448px;
 				margin: 15px 0 20px 0;
-
+				border-radius: 4px;
+				box-sizing: border-box;
 				/deep/.el-input__inner {
 					height: 30px;
 					font-size: 12px;
@@ -262,6 +276,7 @@
 					}
 
 					background: none;
+					border: none;
 					border: 1px solid #57b196;
 					color: #ffffff;
 				}
@@ -282,7 +297,44 @@
 					color: #68B096;
 				}
 			}
-
+			.colorNamered{
+				width: 448px;
+				margin: 15px 0 20px 0;
+				border-radius: 4px;
+				box-sizing: border-box;
+				/deep/.el-input__inner {
+					height: 30px;
+					font-size: 12px;
+				
+					&::placeholder {
+						color: #68B096;
+						font-size: 12px;
+						font-family: 'RobotoMono';
+					}
+				
+					background: none;
+					border: none;
+					border: 1px solid #F56C6C;
+					color: #ffffff;
+				}
+				
+				
+				/deep/.el-input__inner:focus {
+					background: none;
+					border: 1px solid #F56C6C;
+					color: #ffffff;
+					// height: 30px;
+					// line-height: 30px;
+					box-shadow: 0 2px 4px #F56C6C,
+						0 0 6px #F56C6C;
+				}
+				
+				/deep/.el-input__count-inner {
+					background: none;
+					color: #68B096;
+				}
+				
+			}
 			.btns {
 				width: 100%;
 				display: flex;

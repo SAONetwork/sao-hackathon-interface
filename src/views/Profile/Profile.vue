@@ -431,7 +431,7 @@
 						}
 					});
 				} else {
-					location.href = "https://demo.storverse.app";
+					location.href = "https://harmonious-treacle-9cadd3.netlify.app";
 				}
 			})
 			this.$refs.scrollbar.handleScroll=()=>{
@@ -577,7 +577,7 @@
 			Disconnect() {
 				this.$disconnect();
 
-				location.href = "https://demo.storverse.app";
+				location.href = "https://harmonious-treacle-9cadd3.netlify.app";
 			},
 			getSummary() {
 				getUserSummary()

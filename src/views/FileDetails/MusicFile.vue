@@ -67,11 +67,16 @@
 					</div>
 				</div>
 			</div>
-			<el-scrollbar style="height: 80px;width: 900px;">
+			<el-scrollbar class="scrolldesc">
 			<div class="filedesc">
 				{{fileParams.Description}}
 			</div>
 			</el-scrollbar>
+			<!-- <el-scrollbar style="height: 80px;width: 900px;">
+			<div class="filedesc">
+				{{fileParams.Description}}
+			</div>
+			</el-scrollbar> -->
 			
 			<div class="ipfsandcointitle">
 				<span> Ipfs Pinned:&nbsp;</span> <span class="ipfsandcoin">{{fileParams.IpfsHash}}</span>
@@ -338,9 +343,9 @@
 		methods: {
 			shareTwitter() {
 				let url =document.location.href
-				console.log(url);
-				let title =document.title
-				console.log(title);
+			
+				let title = 'I found an interesting file! Check it out'
+				
 			      function popupwindow(url, title) {
 			        return window.open(
 			          "https://twitter.com/intent/tweet?url=" +
@@ -727,7 +732,17 @@
 			margin-right: -17px !important;
 			overflow: auto;
 		}
-
+		.scrolldesc{
+			width: 900px;
+			max-height: 90px;
+			padding-bottom: 13px;
+			margin-top: 10px;
+			/deep/.el-scrollbar__view{
+			  width: 100%;
+			max-height: 90px;
+			}
+			
+		}
 	}
 a{ text-decoration: none; 
 		color: #68B096;

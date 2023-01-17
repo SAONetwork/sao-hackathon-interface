@@ -26,6 +26,7 @@
 </template>
 
 <script>
+	import utils from '../libs/utils.js'
 	export default{
 		props: {
 			userlist: {
@@ -41,13 +42,25 @@
 		},
 		methods:{
 			gotoOtherProfile(item){
-				let routeData = this.$router.resolve({
-					path: 'OtherProfile',
-					query: {
-						address: item.EthAddr
-					}
-				})
-				window.open(routeData.href, '_blank');
+				
+				let address=utils.getUser().EthAddr.toLowerCase()
+				if(address!==item.EthAddr.toLowerCase()){
+					let routeData = this.$router.resolve({
+						path: 'OtherProfile',
+						query: {
+							address: item.EthAddr
+						}
+					})
+					window.open(routeData.href, '_blank');
+				}else{
+					let routeData = this.$router.resolve({
+						path: 'Profile'
+					})
+					window.open(routeData.href, '_blank');
+					
+				}
+				
+				
 				// this.$router.push('/OtherProfile')
 			}
 		}
@@ -110,9 +123,10 @@
 				font-size: 16px;
 				line-height: 21px;
 				color: #58FFC3;
-				overflow: hidden;
-				text-overflow:ellipsis;
-				white-space: nowrap;
+				word-break: break-all;
+				// overflow: hidden;
+				// text-overflow:ellipsis;
+				// white-space: nowrap;
 			}
 		}
 	}

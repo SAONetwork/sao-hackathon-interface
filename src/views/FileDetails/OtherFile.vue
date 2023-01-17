@@ -297,9 +297,9 @@
 		methods: {
 			shareTwitter() {
 				let url =document.location.href
-				console.log(url);
-				let title =document.title
-				console.log(title);
+				
+				let title = 'I found an interesting file! Check it out'
+				
 			      function popupwindow(url, title) {
 			        return window.open(
 			          "https://twitter.com/intent/tweet?url=" +

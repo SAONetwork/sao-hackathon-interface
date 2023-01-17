@@ -14,10 +14,13 @@
 					<el-scrollbar>
 						<div  class="user-list">
 							<div  v-for="(item,index) in followList" :key="item.EthAddr">
-								<div  class="user-avatar" @click="gotodetails(item)">
-									<img v-if="item.Avatar" :src="item.Avatar" alt="">
-									<img v-else src="../assets/images/Profile/avatar.png" alt="">
-								</div>
+								<el-tooltip class="item" effect="dark" :content="item.Username" placement="bottom">
+								      <div  class="user-avatar" @click="gotodetails(item)">
+								      	<img v-if="item.Avatar" :src="item.Avatar" alt="">
+								      	<img v-else src="../assets/images/Profile/avatar.png" alt="">
+								      </div>
+								    </el-tooltip>
+								
 								
 							</div>
 							

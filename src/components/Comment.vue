@@ -16,7 +16,8 @@
 			  maxlength="300"
 			 ref="inputs"
 			  placeholder="Please enter your opinion"
-			  v-model="myComment">
+			  v-model="myComment"
+			  @blur="checkInput">
 			</el-input>
 			<div class="inputcomment">
 				<div class="inputNumber">{{myComment.length}}/300</div>
@@ -95,78 +96,14 @@
 				showOther:false,
 				otherComment:{},
 				focusinput:false,
-				CommentLists:[
-					{
-						name:'MInaj',
-						avatar:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fmtonews.com%2F.image%2Fc_limit%2Ccs_srgb%2Cq_auto%3Agood%2Cw_700%2FMTU1MTAwNjkxNjc5OTQ1ODQ2%2Fnicki_russian1png.png&refer=http%3A%2F%2Fmtonews.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1661308832&t=c8ed3c942139d1f389a2b0469cf2f874',
-						time:'2022-07-26',
-						content:'I love reading this magazine',
-						goodNumber:300,
-						isGood:true,
-						pComment:[]
-					},{
-						name:'dualipa',
-						avatar:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201806%2F27%2F20180627083237_njceu.jpg&refer=http%3A%2F%2Fb-ssl.duitang.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1661308867&t=51f9240d67088c1954d9fc4f406a631f',
-						time:'2022-07-26',
-						content:'How much does this book sell for on Amazon?',
-						goodNumber:300,
-						isGood:true,
-						
-						pComment:[
-							{
-								pAvatar:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201806%2F27%2F20180627083237_njceu.jpg&refer=http%3A%2F%2Fb-ssl.duitang.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1661308867&t=51f9240d67088c1954d9fc4f406a631f',
-								pContent:'How much does this book sell for on Amazon?'
-							},
-							{
-								pAvatar:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fmtonews.com%2F.image%2Fc_limit%2Ccs_srgb%2Cq_auto%3Agood%2Cw_700%2FMTU1MTAwNjkxNjc5OTQ1ODQ2%2Fnicki_russian1png.png&refer=http%3A%2F%2Fmtonews.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1661308832&t=c8ed3c942139d1f389a2b0469cf2f874',
-								pContent:'seems like a lot'
-							},
-						]
-					},
-					{
-						name:'nicki',
-						avatar:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fmtonews.com%2F.image%2Fc_limit%2Ccs_srgb%2Cq_auto%3Agood%2Cw_700%2FMTU1MTAwNjkxNjc5OTQ1ODQ2%2Fnicki_russian1png.png&refer=http%3A%2F%2Fmtonews.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1661308832&t=c8ed3c942139d1f389a2b0469cf2f874',
-						time:'2022-07-26',
-						content:'I love reading this magazine',
-						goodNumber:300,
-						isGood:false,
-						ismine:true,
-						pComment:[]
-					},
-					{
-						name:'nicki',
-						avatar:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fmtonews.com%2F.image%2Fc_limit%2Ccs_srgb%2Cq_auto%3Agood%2Cw_700%2FMTU1MTAwNjkxNjc5OTQ1ODQ2%2Fnicki_russian1png.png&refer=http%3A%2F%2Fmtonews.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1661308832&t=c8ed3c942139d1f389a2b0469cf2f874',
-						time:'2022-07-26',
-						content:'I love reading this magazine',
-						goodNumber:300,
-						isGood:false,
-						ismine:true,
-						pComment:[]
-					},
-					{
-						name:'nicki',
-						avatar:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fmtonews.com%2F.image%2Fc_limit%2Ccs_srgb%2Cq_auto%3Agood%2Cw_700%2FMTU1MTAwNjkxNjc5OTQ1ODQ2%2Fnicki_russian1png.png&refer=http%3A%2F%2Fmtonews.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1661308832&t=c8ed3c942139d1f389a2b0469cf2f874',
-						time:'2022-07-26',
-						content:'I love reading this magazine',
-						goodNumber:300,
-						isGood:false,
-						ismine:true,
-						pComment:[]
-					},
-					{
-						name:'nicki',
-						avatar:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fmtonews.com%2F.image%2Fc_limit%2Ccs_srgb%2Cq_auto%3Agood%2Cw_700%2FMTU1MTAwNjkxNjc5OTQ1ODQ2%2Fnicki_russian1png.png&refer=http%3A%2F%2Fmtonews.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1661308832&t=c8ed3c942139d1f389a2b0469cf2f874',
-						time:'2022-07-26',
-						content:'I love reading this magazine',
-						goodNumber:300,
-						isGood:false,
-						ismine:true,
-						pComment:[]
-					},
-				]
+				
 			}
 		},
 		methods:{
+			checkInput(){
+				
+				
+			},
 			gotodetails(value){
 				
 				let routeData = this.$router.resolve({
@@ -179,10 +116,16 @@
 			},
 			gotoReply(){
 				
-				this.$emit('replyComment',this.otherComment,this.myComment)
-				this.otherComment={}
-				this.myComment=''
-				this.showOther=false
+				if(this.myComment.length == 0||this.myComment.split(" ").join("").length == 0){
+					this.myComment=''
+					return
+				}else{
+					this.$emit('replyComment',this.otherComment,this.myComment)
+					this.otherComment={}
+					this.myComment=''
+					this.showOther=false
+				}
+				
 			},
 			deleteComment(item,index){
 				this.$emit('deleteComment',item,index)
