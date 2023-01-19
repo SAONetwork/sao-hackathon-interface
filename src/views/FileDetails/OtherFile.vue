@@ -48,10 +48,10 @@
 								<ActiveBtn @onClickBtn="buyprofile" :btnText="paynowbtnText" :btnstyle="middleSize"
 									v-else></ActiveBtn>
 								<div class="price">{{fileParams.Price}} ETH</div>
-								<div class="middlebtn"  @click="deletethisFile" v-if="fileParams.EthAddr.toLowerCase()==address">
+								<!-- <div class="middlebtn"  @click="deletethisFile" v-if="fileParams.EthAddr.toLowerCase()==address">
 									<img class="btn-img" src="@/assets/images/Profile/redbtn.png" alt="">
 									<span  class="btn-text">Delete file</span>
-								</div>
+								</div> -->
 							</div>
 							<div class="nobuy" v-if="fileParams.Price>0 && fileParams.AlreadyPaid==true">
 							
@@ -66,7 +66,7 @@
 								</ActiveBtn>
 								<div class="middlebtn"  @click="deletethisFile" v-if="fileParams.EthAddr.toLowerCase()==address">
 									<img class="btn-img" src="@/assets/images/Profile/redbtn.png" alt="">
-									<span  class="btn-text">Delete file</span>
+									<span  class="btn-text">Delete File</span>
 								</div>
 							</div>
 						</div>
@@ -235,7 +235,7 @@
 					owner:''
 				},
 				addcollTotal:0,
-				deleteTitle:'Delete file',
+				deleteTitle:'Delete File',
 				showDelete:false,
 				iscopy: false,
 			}

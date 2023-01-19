@@ -90,17 +90,16 @@
 							<div v-if="fileParams.EthAddr.toLowerCase() == address">
 								<ActiveBtn @onClickBtn="gotodownload" :btnText="gotodownloadbtn" :btnstyle="middleSize"
 									></ActiveBtn>
-									<div class="middlebtn"  @click="deletethisFile">
+									<!-- <div class="middlebtn"  @click="deletethisFile">
 										<img class="btn-img" src="@/assets/images/Profile/redbtn.png" alt="">
 										<span  class="btn-text">Delete file</span>
-									</div>
+									</div> -->
 							</div>
 							
 							<ActiveBtn @onClickBtn="buyprofile" :btnText="paynowbtnText" :btnstyle="middleSize" v-else>
 							</ActiveBtn>
 							
 							<div class="price">{{fileParams.Price}} ETH</div>
-				
 						</div>
 						
 						<div class="nobuy" v-if="fileParams.Price>0 && fileParams.AlreadyPaid==true">
@@ -115,7 +114,7 @@
 							</ActiveBtn>
 							<div class="middlebtn"  v-if="fileParams.EthAddr.toLowerCase() == address" @click="deletethisFile">
 								<img class="btn-img" src="@/assets/images/Profile/redbtn.png" alt="">
-								<span  class="btn-text">Delete file</span>
+								<span  class="btn-text">Delete File</span>
 							</div>
 						</div>
 						
@@ -244,7 +243,7 @@
 	export default {
 		data() {
 			return {
-				deleteTitle:'Delete file',
+				deleteTitle:'Delete File',
 				showDelete:false,
 				
 				collectionParams:{
