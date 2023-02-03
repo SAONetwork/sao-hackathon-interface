@@ -136,7 +136,7 @@
 						  placement="right-start"
 						  width="210"
 						  trigger="hover"
-						   popper-class="popoverBackB"
+						   popper-class="popoverBackA"
 						  >
 							<div class="shareBroad">
 								<div class="single-share" @click="shareTwitter">
@@ -693,7 +693,7 @@
 	}
 </script>
 <style>
-	.popoverBackB {
+	.popoverBackA {
 		height: 144px;
 		padding: 0px !important;
 		box-sizing: border-box;
